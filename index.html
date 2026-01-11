@@ -5,7 +5,6 @@
   <title>Radio Nest Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -25,6 +24,7 @@
       padding: 0;
     }
 
+    /* PAGE LAYOUT — NOT A WIDGET */
     body {
       min-height: 100vh;
       font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -33,23 +33,22 @@
         radial-gradient(circle at 10% 0%, rgba(255, 190, 130, 0.35), transparent 60%),
         radial-gradient(circle at 90% 100%, rgba(178, 120, 255, 0.35), transparent 55%),
         #08050b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      display: block;              /* NO CENTERING */
+      padding: 40px 50px;          /* PAGE MARGINS */
     }
 
     .page-wrap {
       width: 100%;
-      max-width: 980px;
+      max-width: 1180px;           /* WIDER LIKE MEDIA SITE */
+      margin: 0 auto;
     }
 
-    /* Masthead (like site name area on Media Site) */
+    /* MASTHEAD */
     .masthead {
       display: flex;
       flex-direction: column;
       gap: 3px;
-      margin-bottom: 18px;
+      margin-bottom: 10px;         /* TIGHTER LIKE MEDIA SITE */
     }
 
     .masthead-title {
@@ -71,15 +70,15 @@
       color: var(--text-muted);
     }
 
-    /* Main two-column layout (Media Site A shape) */
+    /* MAIN PLAYER LAYOUT */
     .player-layout {
       display: grid;
-      grid-template-columns: 280px minmax(0, 1fr);
-      column-gap: 30px;
+      grid-template-columns: 320px minmax(0, 1fr); /* BIGGER ART */
+      column-gap: 24px;
       align-items: center;
     }
 
-    /* Album art area (left) */
+    /* ALBUM ART */
     .art-wrap {
       position: relative;
       width: 100%;
@@ -96,7 +95,6 @@
       display: block;
     }
 
-    /* Fallback chip (shows only when using fallback) */
     .fallback-chip {
       position: absolute;
       left: 10px;
@@ -111,14 +109,14 @@
       color: var(--text-muted);
     }
 
-    /* Right-hand metadata block */
+    /* METADATA */
     .meta-wrap {
       display: flex;
       flex-direction: column;
     }
 
     .onair-label {
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.22em;
       color: var(--text-muted);
@@ -131,7 +129,7 @@
     }
 
     .track-title {
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
@@ -141,7 +139,7 @@
     }
 
     .track-artist {
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.22em;
       color: var(--text-sub);
@@ -155,7 +153,7 @@
       margin-bottom: 18px;
     }
 
-    /* Controls row (Play + Volume) */
+    /* CONTROLS */
     .controls-row {
       display: flex;
       align-items: center;
@@ -164,8 +162,8 @@
     }
 
     .play-btn {
-      width: 58px;
-      height: 58px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       border: none;
       background: #ffffff;
@@ -202,16 +200,7 @@
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
     }
 
-    .volume-bar::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: none;
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
-    }
-
-    /* Footer row */
+    /* FOOTER */
     .footer-row {
       display: flex;
       justify-content: space-between;
@@ -225,59 +214,29 @@
     .meta-status.error {
       color: var(--error);
     }
-
-    /* Responsive tweak */
-    @media (max-width: 720px) {
-      body {
-        align-items: flex-start;
-      }
-
-      .player-layout {
-        grid-template-columns: 1fr;
-        row-gap: 20px;
-      }
-
-      .art-wrap {
-        max-width: 320px;
-        margin: 0 auto;
-      }
-    }
   </style>
 </head>
 
 <body>
   <div class="page-wrap">
-    <!-- Masthead -->
+
     <div class="masthead">
-      <button
-        class="masthead-title"
-        type="button"
-        onclick="window.open('https://myradionest.com', '_blank')"
-      >
+      <button class="masthead-title" onclick="window.open('https://myradionest.com', '_blank')">
         RADIO NEST PLAYER
       </button>
       <div class="masthead-sub">RADIO NEST · STREAMING</div>
     </div>
 
-    <!-- Media Site A–style layout -->
     <main class="player-layout">
-      <!-- Left: Album art (dynamic) -->
       <div class="art-wrap">
-        <img
-          id="albumArt"
-          class="art-img"
-          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png"
-          alt="Album Art"
-        />
+        <img id="albumArt" class="art-img"
+          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png">
         <div id="fallbackChip" class="fallback-chip">RADIO - LIVE STREAM</div>
       </div>
 
-      <!-- Right: Metadata + controls -->
       <div class="meta-wrap">
         <div>
-          <div class="onair-label">
-            <span>On Air</span> Now Playing
-          </div>
+          <div class="onair-label"><span>On Air</span> Now Playing</div>
           <div id="trackTitle" class="track-title">Loading...</div>
           <div id="trackArtist" class="track-artist"></div>
           <div id="trackSub" class="track-sub">Radio - Live Stream</div>
@@ -286,14 +245,7 @@
         <div class="controls-row">
           <button id="playBtn" class="play-btn">Play</button>
           <div class="volume-wrap">
-            <input
-              id="volumeSlider"
-              type="range"
-              min="0"
-              max="100"
-              value="100"
-              class="volume-bar"
-            />
+            <input id="volumeSlider" type="range" min="0" max="100" value="100" class="volume-bar">
           </div>
         </div>
 
@@ -303,6 +255,7 @@
         </div>
       </div>
     </main>
+
   </div>
 
   <audio id="audioEl"></audio>
@@ -327,22 +280,13 @@
         "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
       const FALLBACK_TEXT = "Radio - Live Stream";
 
-      if (streamUrl) {
-        audio.src = streamUrl;
-      }
+      if (streamUrl) audio.src = streamUrl;
       audio.volume = 1.0;
 
       playBtn.addEventListener("click", () => {
         if (!audio.src) return;
         if (audio.paused) {
-          audio
-            .play()
-            .then(() => {
-              playBtn.textContent = "Pause";
-            })
-            .catch(() => {
-              // ignore autoplay errors
-            });
+          audio.play().then(() => playBtn.textContent = "Pause");
         } else {
           audio.pause();
           playBtn.textContent = "Play";
@@ -350,17 +294,13 @@
       });
 
       volumeSlider.addEventListener("input", () => {
-        const v = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
-        audio.volume = v;
+        audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
       });
 
       async function fetchMetadata() {
         if (!metaUrl) {
           metaStatusEl.textContent = "No metadata source configured";
           metaStatusEl.classList.add("error");
-          trackTitleEl.textContent = "Loading...";
-          trackArtistEl.textContent = "";
-          trackSubEl.textContent = FALLBACK_TEXT;
           albumArt.src = FALLBACK_ART;
           fallbackChip.style.display = "inline-flex";
           return;
@@ -392,7 +332,8 @@
 
           await updateArtwork(artist, title);
           metaStatusEl.textContent = "Updated just now";
-        } catch (e) {
+
+        } catch {
           metaStatusEl.textContent = "Metadata error";
           metaStatusEl.classList.add("error");
           albumArt.src = FALLBACK_ART;
@@ -408,25 +349,23 @@
           return;
         }
 
-        const query = encodeURIComponent(q);
-
         try {
           const res = await fetch(
-            `https://itunes.apple.com/search?media=music&limit=1&term=${query}`
+            `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
           );
           const json = await res.json();
 
-          if (!json.results || !json.results.length) {
+          if (!json.results.length) {
             albumArt.src = FALLBACK_ART;
             fallbackChip.style.display = "inline-flex";
             return;
           }
 
-          const art100 = json.results[0].artworkUrl100 || "";
-          const art = art100.replace("100x100bb.jpg", "300x300bb.jpg");
+          const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
           albumArt.src = art;
           fallbackChip.style.display = "none";
-        } catch (e) {
+
+        } catch {
           albumArt.src = FALLBACK_ART;
           fallbackChip.style.display = "inline-flex";
         }
@@ -441,5 +380,6 @@
       }
     })();
   </script>
+
 </body>
 </html>
