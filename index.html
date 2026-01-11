@@ -25,7 +25,7 @@
       --text: #fff;
       --subtext: rgba(255,255,255,0.7);
       --glass: rgba(255,255,255,0.06);
-      --title-color: #1a76c8; /* updated light-theme title colour */
+      --title-color: #1a76c8;
     }
 
     body {
@@ -100,6 +100,7 @@
       position: relative;
       box-shadow: 0 22px 40px rgba(0,0,0,0.5);
       flex-shrink: 0;
+      border-radius: 12px;
     }
 
     .art-img {
@@ -135,7 +136,6 @@
       overflow: hidden;
     }
 
-    /* NOW PLAYING — now follows var(--text) */
     .onair-label {
       font-size: 13px;
       font-weight: 600;
@@ -213,7 +213,6 @@
       background: var(--subtext);
     }
 
-    /* Chrome / Edge / Safari */
     .volume-bar::-webkit-slider-thumb {
       width: 14px;
       height: 14px;
@@ -225,7 +224,6 @@
       box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
     }
 
-    /* Firefox */
     .volume-bar::-moz-range-thumb {
       width: 14px;
       height: 14px;
@@ -239,6 +237,58 @@
       height: 4px;
       background: var(--subtext);
       border-radius: 999px;
+    }
+
+    /* MOBILE + TABLET LAYOUT */
+    @media (max-width: 1024px) {
+
+      .page-wrap {
+        padding: 20px;
+      }
+
+      .player-layout {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+      }
+
+      .meta-wrap {
+        text-align: center;
+        align-items: center;
+        order: 4;
+      }
+
+      .art-wrap {
+        width: 100%;
+        max-width: 350px;
+        order: 5;
+      }
+
+      .play-btn {
+        margin: 0 auto;
+        order: 2;
+      }
+
+      .onair-label {
+        order: 3;
+      }
+
+      .track-title {
+        order: 4;
+        font-size: 24px;
+      }
+
+      .track-artist {
+        order: 4;
+      }
+
+      .track-sub {
+        order: 4;
+      }
+
+      .volume-wrap {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -256,24 +306,23 @@
 
     <div class="player-layout">
 
+      <button id="playButton" class="play-btn">PLAY</button>
+
+      <div class="onair-label"><span>●</span> NOW PLAYING</div>
+
+      <div class="meta-wrap">
+        <div id="trackTitle" class="track-title">Loading…</div>
+        <div id="trackArtist" class="track-artist"></div>
+        <div id="trackSub" class="track-sub"></div>
+      </div>
+
       <div class="art-wrap">
         <img id="artwork" class="art-img" src="" alt="">
         <div id="fallbackChip" class="fallback-chip">NO ARTWORK</div>
       </div>
 
-      <div class="meta-wrap">
-        <div class="onair-label"><span>●</span> NOW PLAYING</div>
-
-        <div id="trackTitle" class="track-title">Loading…</div>
-        <div id="trackArtist" class="track-artist"></div>
-        <div id="trackSub" class="track-sub"></div>
-
-        <div class="controls-block">
-          <button id="playButton" class="play-btn">PLAY</button>
-          <div class="volume-wrap">
-            <input id="volumeBar" class="volume-bar" type="range" min="0" max="100" value="100">
-          </div>
-        </div>
+      <div class="volume-wrap">
+        <input id="volumeBar" class="volume-bar" type="range" min="0" max="100" value="100">
       </div>
 
     </div>
@@ -334,7 +383,6 @@ function showFallback() {
   fallbackChip.style.display = "none";
 }
 
-/* STOP instead of PAUSE */
 playButton.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -345,7 +393,7 @@ playButton.addEventListener("click", () => {
   }
 });
 
-volumeBar.addEventListener("input", () => {
+volumeBar?.addEventListener("input", () => {
   audio.volume = volumeBar.value / 100;
 });
 
