@@ -6,16 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg-color: #141218;
-      --card-bg: rgba(20, 18, 24, 0.9);
-      --accent: #2f80ed;
+      --bg-main: #050308;
+      --bg-gradient-1: #4b2b20;
+      --bg-gradient-2: #141218;
+      --accent-orange: #ff9c35;
+      --accent-blue: #2f80ed;
       --text-main: #ffffff;
-      --text-subtle: #d0cdd7;
-      --muted: #8f8d99;
-      --danger: #ff4b5c;
-      --success: #32d48e;
-      --border-soft: rgba(255, 255, 255, 0.08);
-      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.5);
+      --text-subtle: #e0dde5;
+      --text-muted: #a19bab;
+      --error: #ff4b5c;
     }
 
     * {
@@ -27,95 +26,69 @@
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
-      background: radial-gradient(circle at top left, #50317e, #141218 55%, #05030a);
-      color: var(--text-main);
+      background:
+        radial-gradient(circle at 15% 0, rgba(255, 200, 150, 0.4), transparent 55%),
+        radial-gradient(circle at 85% 100%, rgba(200, 140, 255, 0.35), transparent 55%),
+        radial-gradient(circle at 50% 50%, var(--bg-gradient-1), var(--bg-gradient-2));
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
       padding: 12px;
+      color: var(--text-main);
     }
 
     .player-shell {
       width: 100%;
-      max-width: 640px;
-      background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.06),
-          rgba(0, 0, 0, 0.75)
-        ),
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent);
+      max-width: 720px;
+      background: rgba(5, 3, 8, 0.9);
       border-radius: 18px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 14px 16px 16px;
-      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px 14px 14px;
+      backdrop-filter: blur(18px);
     }
 
     .player-header {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
-      gap: 12px;
+      margin-bottom: 8px;
     }
 
     .brand-link {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
-      color: var(--accent);
+      color: var(--accent-blue);
       text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 0;
       cursor: pointer;
-      white-space: nowrap;
     }
 
-    .brand-link:focus,
-    .brand-link:hover {
+    .brand-link:hover,
+    .brand-link:focus {
       text-decoration-thickness: 2px;
     }
 
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 9px 3px 4px;
-      border-radius: 999px;
-      background: rgba(50, 212, 142, 0.08);
-      border: 1px solid rgba(50, 212, 142, 0.4);
+    .onair-label {
       font-size: 10px;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-subtle);
+      color: var(--text-muted);
     }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 8px rgba(50, 212, 142, 0.8);
-      animation: pulse-dot 1.8s infinite;
-    }
-
-    @keyframes pulse-dot {
-      0% {
-        transform: scale(0.95);
-        opacity: 0.9;
-      }
-      50% {
-        transform: scale(1.08);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(0.95);
-        opacity: 0.9;
-      }
+    .onair-label span {
+      color: var(--accent-orange);
+      font-weight: 600;
     }
 
     .player-main {
       display: grid;
-      grid-template-columns: 1.1fr 1.6fr;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.55fr);
       gap: 14px;
+      align-items: stretch;
     }
 
     .art-wrap {
@@ -123,7 +96,7 @@
       border-radius: 14px;
       overflow: hidden;
       background: radial-gradient(circle at top, #4b296d, #040308);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       aspect-ratio: 1 / 1;
     }
 
@@ -139,107 +112,123 @@
       inset: 0;
       background: linear-gradient(
         to top,
-        rgba(0, 0, 0, 0.65),
-        rgba(0, 0, 0, 0.1) 40%,
+        rgba(0, 0, 0, 0.7),
+        rgba(0, 0, 0, 0.2) 45%,
         transparent
       );
       pointer-events: none;
     }
 
-    .fallback-tag {
+    .art-tag {
       position: absolute;
       left: 8px;
       bottom: 8px;
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      padding: 4px 7px;
+      letter-spacing: 0.12em;
+      padding: 4px 8px;
       border-radius: 999px;
       background: rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--muted);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .player-right {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       gap: 8px;
     }
 
-    .section-label {
-      font-size: 11px;
+    .meta-top {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .onair-header {
+      font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--muted);
-      margin-bottom: 3px;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+    }
+
+    .onair-header span {
+      color: var(--accent-orange);
+      font-weight: 600;
     }
 
     .track-title {
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
       color: var(--text-main);
-      line-height: 1.2;
-      margin-bottom: 2px;
+      line-height: 1.1;
       min-height: 1.2em;
     }
 
     .track-artist {
       font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
       color: var(--text-subtle);
-      margin-bottom: 6px;
-      min-height: 1em;
+      min-height: 1.1em;
     }
 
     .fallback-text {
       font-size: 11px;
-      color: var(--muted);
+      color: var(--text-muted);
+      margin-top: 2px;
     }
 
     .controls-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 4px;
+      justify-content: space-between;
+      margin-top: 6px;
+      gap: 10px;
     }
 
     .play-button {
-      width: 42px;
-      height: 42px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       border: none;
+      background: radial-gradient(circle at 30% 20%, #ffffff, #ffb057);
+      color: #000000;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 30% 20%, #ffffff, #2f80ed);
-      color: #000000;
       cursor: pointer;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+      flex-shrink: 0;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
     }
 
     .play-button:active {
       transform: translateY(1px) scale(0.98);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75);
       filter: brightness(0.96);
     }
 
-    .play-icon {
+    .play-icon-shape {
       width: 0;
       height: 0;
       border-style: solid;
-      border-width: 7px 0 7px 12px;
+      border-width: 9px 0 9px 14px;
       border-color: transparent transparent transparent #000000;
       margin-left: 2px;
     }
 
     .pause-icon {
       display: flex;
-      gap: 3px;
+      gap: 4px;
     }
 
     .pause-bar {
       width: 3px;
-      height: 14px;
+      height: 16px;
       border-radius: 999px;
       background: #000000;
     }
@@ -252,11 +241,8 @@
     }
 
     .volume-icon {
-      width: 16px;
-      height: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      width: 18px;
+      height: 18px;
       color: var(--text-subtle);
       flex-shrink: 0;
     }
@@ -267,7 +253,7 @@
       width: 100%;
       height: 4px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.18);
       outline: none;
       cursor: pointer;
     }
@@ -279,8 +265,8 @@
       height: 14px;
       border-radius: 50%;
       background: #ffffff;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.35);
+      border: 2px solid var(--accent-orange);
+      box-shadow: 0 0 0 3px rgba(255, 156, 53, 0.45);
       margin-top: -5px;
     }
 
@@ -289,39 +275,31 @@
       height: 14px;
       border-radius: 50%;
       background: #ffffff;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.35);
+      border: 2px solid var(--accent-orange);
+      box-shadow: 0 0 0 3px rgba(255, 156, 53, 0.45);
     }
 
     .volume-slider::-moz-range-track {
       height: 4px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.18);
     }
 
-    .meta-footer {
-      margin-top: 8px;
+    .footer-row {
+      margin-top: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 10px;
-      color: var(--muted);
+      color: var(--text-muted);
       gap: 8px;
     }
 
-    .meta-source {
-      opacity: 0.85;
+    .meta-status.error {
+      color: var(--error);
     }
 
-    .meta-refresh {
-      font-variant-numeric: tabular-nums;
-    }
-
-    .error-text {
-      color: var(--danger);
-    }
-
-    @media (max-width: 560px) {
+    @media (max-width: 640px) {
       .player-main {
         grid-template-columns: 1fr;
       }
@@ -338,17 +316,18 @@
     <div class="player-header">
       <button
         class="brand-link"
-        onclick="window.open('https://myradionest.com','_blank')"
+        type="button"
+        onclick="window.open('https://myradionest.com', '_blank')"
       >
         Radio Nest Player
       </button>
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        <span>On Air</span>
+      <div class="onair-label">
+        <span>On Air</span> • Now Playing
       </div>
     </div>
 
     <div class="player-main">
+      <!-- LEFT: ARTWORK -->
       <div class="art-wrap">
         <img
           id="albumArt"
@@ -357,12 +336,15 @@
           alt="Album art"
         />
         <div class="art-overlay"></div>
-        <div id="fallbackTag" class="fallback-tag">Radio - Live Stream</div>
+        <div id="artTag" class="art-tag">Radio - Live Stream</div>
       </div>
 
+      <!-- RIGHT: METADATA & CONTROLS -->
       <div class="player-right">
-        <div>
-          <div class="section-label">Now Playing</div>
+        <div class="meta-top">
+          <div class="onair-header">
+            <span>On Air</span> • Now Playing
+          </div>
           <div id="trackTitle" class="track-title">Loading...</div>
           <div id="trackArtist" class="track-artist"></div>
           <div id="fallbackText" class="fallback-text">
@@ -370,40 +352,41 @@
           </div>
         </div>
 
-        <div class="controls-row">
-          <button id="playPauseBtn" class="play-button" type="button">
-            <div class="play-icon" id="playIcon"></div>
-          </button>
+        <div>
+          <div class="controls-row">
+            <button id="playPauseBtn" class="play-button" type="button">
+              <div id="playIcon" class="play-icon-shape"></div>
+            </button>
 
-          <div class="volume-wrap">
-            <div class="volume-icon">
-              <!-- simple speaker icon -->
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                aria-hidden="true"
-              >
-                <path
-                  fill="currentColor"
-                  d="M4 9v6h3l4 4V5L7 9H4zm10.54-4.46L13.83 6.3A4.978 4.978 0 0 1 16 9c0 1.3-.5 2.55-1.46 3.46l.71 1.76A6.96 6.96 0 0 0 18 9a6.96 6.96 0 0 0-3.46-4.46z"
-                ></path>
-              </svg>
+            <div class="volume-wrap">
+              <div class="volume-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M4 9v6h3l4 4V5L7 9H4zm10.54-4.46L13.83 6.3A4.978 4.978 0 0 1 16 9c0 1.3-.5 2.55-1.46 3.46l.71 1.76A6.96 6.96 0 0 0 18 9a6.96 6.96 0 0 0-3.46-4.46z"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                id="volumeSlider"
+                class="volume-slider"
+                type="range"
+                min="0"
+                max="100"
+                value="100"
+              />
             </div>
-            <input
-              id="volumeSlider"
-              class="volume-slider"
-              type="range"
-              min="0"
-              max="100"
-              value="100"
-            />
           </div>
-        </div>
 
-        <div class="meta-footer">
-          <span class="meta-source">Artwork via iTunes Search API</span>
-          <span id="metaStatus" class="meta-refresh">Updating every 15s</span>
+          <div class="footer-row">
+            <span>Artwork via iTunes Search API</span>
+            <span id="metaStatus" class="meta-status">Updating every 15s</span>
+          </div>
         </div>
       </div>
     </div>
@@ -413,126 +396,125 @@
 
   <script>
     (function () {
-      const urlParams = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams(window.location.search);
+      const streamUrl = params.get("stream") || "";
+      const metaUrl = params.get("meta") || "";
 
-      const streamUrl = urlParams.get("stream") || "";
-      const metaUrl = urlParams.get("meta") || "";
       const refreshIntervalMs = 15000; // 15 seconds
+
+      const FALLBACK_ART =
+        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+      const FALLBACK_TEXT = "Radio - Live Stream";
 
       const audioEl = document.getElementById("audioElement");
       const playPauseBtn = document.getElementById("playPauseBtn");
       const playIcon = document.getElementById("playIcon");
       const volumeSlider = document.getElementById("volumeSlider");
       const albumArt = document.getElementById("albumArt");
+      const artTag = document.getElementById("artTag");
       const trackTitleEl = document.getElementById("trackTitle");
       const trackArtistEl = document.getElementById("trackArtist");
       const fallbackTextEl = document.getElementById("fallbackText");
-      const fallbackTagEl = document.getElementById("fallbackTag");
       const metaStatusEl = document.getElementById("metaStatus");
 
-      const FALLBACK_ART =
-        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-
-      function setPlayIcon(isPlaying) {
+      function setPlayVisual(isPlaying) {
+        if (!playIcon) return;
         playIcon.innerHTML = "";
         if (isPlaying) {
-          const pause = document.createElement("div");
-          pause.className = "pause-icon";
+          const wrap = document.createElement("div");
+          wrap.className = "pause-icon";
           const bar1 = document.createElement("div");
           bar1.className = "pause-bar";
           const bar2 = document.createElement("div");
           bar2.className = "pause-bar";
-          pause.appendChild(bar1);
-          pause.appendChild(bar2);
-          playIcon.appendChild(pause);
+          wrap.appendChild(bar1);
+          wrap.appendChild(bar2);
+          playIcon.appendChild(wrap);
         } else {
-          const tri = document.createElement("div");
-          tri.className = "play-icon";
-          playIcon.appendChild(tri);
+          playIcon.className = "play-icon-shape";
         }
       }
 
-      // Initialize audio
       if (streamUrl) {
         audioEl.src = streamUrl;
       }
-      // Default volume 100%
+
       audioEl.volume = 1.0;
       volumeSlider.value = 100;
 
-      // Play / Pause
       playPauseBtn.addEventListener("click", () => {
         if (!audioEl.src) return;
         if (audioEl.paused) {
           audioEl
             .play()
-            .then(() => setPlayIcon(true))
-            .catch((err) => {
-              console.error("Playback error:", err);
-            });
+            .then(() => setPlayVisual(true))
+            .catch((err) => console.error("Playback error:", err));
         } else {
           audioEl.pause();
-          setPlayIcon(false);
+          setPlayVisual(false);
         }
       });
 
-      audioEl.addEventListener("play", () => setPlayIcon(true));
-      audioEl.addEventListener("pause", () => setPlayIcon(false));
+      audioEl.addEventListener("play", () => setPlayVisual(true));
+      audioEl.addEventListener("pause", () => setPlayVisual(false));
 
-      // Volume handling
       volumeSlider.addEventListener("input", () => {
-        const value = Number(volumeSlider.value || 0);
-        audioEl.volume = Math.min(Math.max(value / 100, 0), 1);
+        const v = Number(volumeSlider.value || 0);
+        audioEl.volume = Math.min(Math.max(v / 100, 0), 1);
       });
 
-      // Metadata + artwork
       async function fetchMetadata() {
         if (!metaUrl) {
           metaStatusEl.textContent = "No metadata source configured";
-          metaStatusEl.classList.add("error-text");
+          metaStatusEl.classList.add("error");
           return;
         }
 
         metaStatusEl.textContent = "Updating...";
-        metaStatusEl.classList.remove("error-text");
+        metaStatusEl.classList.remove("error");
 
         try {
-          const response = await fetch(metaUrl, { cache: "no-store" });
-          if (!response.ok) {
-            throw new Error("Metadata HTTP " + response.status);
-          }
-
-          const data = await response.json();
+          const res = await fetch(metaUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
 
           const artist = (data.artist || "").toString().trim();
           const title = (data.title || "").toString().trim();
 
           if (!artist && !title) {
-            trackTitleEl.textContent = "Radio - Live Stream";
+            trackTitleEl.textContent = FALLBACK_TEXT;
             trackArtistEl.textContent = "";
-            fallbackTextEl.textContent = "Radio - Live Stream";
+            fallbackTextEl.textContent = FALLBACK_TEXT;
             albumArt.src = FALLBACK_ART;
-            if (fallbackTagEl) fallbackTagEl.style.display = "inline-flex";
+            if (artTag) {
+              artTag.style.display = "inline-flex";
+              artTag.textContent = FALLBACK_TEXT;
+            }
             metaStatusEl.textContent = "No track info in metadata";
             return;
           }
 
-          trackTitleEl.textContent = title || "Radio - Live Stream";
+          trackTitleEl.textContent = title || FALLBACK_TEXT;
           trackArtistEl.textContent = artist || "";
-          fallbackTextEl.textContent = "Radio - Live Stream";
+          fallbackTextEl.textContent = FALLBACK_TEXT;
 
-          if (fallbackTagEl) fallbackTagEl.style.display = "none";
+          if (artTag) artTag.style.display = "none";
 
           await updateArtworkFromItunes(artist, title);
           metaStatusEl.textContent = "Updated just now";
         } catch (err) {
           console.error("Metadata error:", err);
           metaStatusEl.textContent = "Metadata error";
-          metaStatusEl.classList.add("error-text");
-          // Fallback visuals
-          trackTitleEl.textContent ||= "Radio - Live Stream";
+          metaStatusEl.classList.add("error");
+
+          if (!trackTitleEl.textContent || trackTitleEl.textContent === "Loading...") {
+            trackTitleEl.textContent = FALLBACK_TEXT;
+          }
           albumArt.src = FALLBACK_ART;
-          if (fallbackTagEl) fallbackTagEl.style.display = "inline-flex";
+          if (artTag) {
+            artTag.style.display = "inline-flex";
+            artTag.textContent = FALLBACK_TEXT;
+          }
         }
       }
 
@@ -540,52 +522,64 @@
         const query = encodeURIComponent(`${artist} ${title}`.trim());
         if (!query) {
           albumArt.src = FALLBACK_ART;
-          if (fallbackTagEl) fallbackTagEl.style.display = "inline-flex";
+          if (artTag) {
+            artTag.style.display = "inline-flex";
+            artTag.textContent = FALLBACK_TEXT;
+          }
           return;
         }
 
         const url = `https://itunes.apple.com/search?media=music&limit=1&term=${query}`;
 
         try {
-          const response = await fetch(url);
-          if (!response.ok) throw new Error("iTunes HTTP " + response.status);
-          const json = await response.json();
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const json = await res.json();
 
           if (!json.results || !json.results.length) {
             albumArt.src = FALLBACK_ART;
-            if (fallbackTagEl) fallbackTagEl.style.display = "inline-flex";
+            if (artTag) {
+              artTag.style.display = "inline-flex";
+              artTag.textContent = FALLBACK_TEXT;
+            }
             return;
           }
 
-          const artUrl = json.results[0].artworkUrl100 || json.results[0].artworkUrl60;
+          const artUrl =
+            json.results[0].artworkUrl100 || json.results[0].artworkUrl60;
           if (!artUrl) {
             albumArt.src = FALLBACK_ART;
-            if (fallbackTagEl) fallbackTagEl.style.display = "inline-flex";
+            if (artTag) {
+              artTag.style.display = "inline-flex";
+              artTag.textContent = FALLBACK_TEXT;
+            }
             return;
           }
 
-          const highRes = artUrl.replace(/100x100bb\.jpg|60x60bb\.jpg/, "300x300bb.jpg");
-          albumArt.src = highRes;
-          if (fallbackTagEl) fallbackTagEl.style.display = "none";
+          const hiRes = artUrl.replace(/100x100bb\.jpg|60x60bb\.jpg/, "300x300bb.jpg");
+          albumArt.src = hiRes;
+          if (artTag) artTag.style.display = "none";
         } catch (err) {
-          console.error("iTunes artwork error:", err);
+          console.error("Artwork error:", err);
           albumArt.src = FALLBACK_ART;
-          if (fallbackTagEl) fallbackTagEl.style.display = "inline-flex";
+          if (artTag) {
+            artTag.style.display = "inline-flex";
+            artTag.textContent = FALLBACK_TEXT;
+          }
         }
       }
 
-      // Start metadata polling
       if (metaUrl) {
         fetchMetadata();
         setInterval(fetchMetadata, refreshIntervalMs);
       } else {
         metaStatusEl.textContent = "No metadata source configured";
-        metaStatusEl.classList.add("error-text");
+        metaStatusEl.classList.add("error");
       }
 
-      // Initial play icon state
-      setPlayIcon(false);
+      setPlayVisual(false);
     })();
   </script>
 </body>
 </html>
+
