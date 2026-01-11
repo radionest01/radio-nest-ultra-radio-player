@@ -259,27 +259,32 @@
 function applyTheme(theme) {
   document.body.classList.remove("theme-light", "theme-dark");
 
-  if (theme === "light") {
+  const t = (theme || "").toLowerCase();
+
+  if (t === "light") {
     document.body.classList.add("theme-light");
-  } else if (theme === "dark") {
+  } else if (t === "dark") {
     document.body.classList.add("theme-dark");
   } else {
     document.body.classList.add("theme-dark");
   }
 }
 
-const params = new URLSearchParams(window.location.search);
-applyTheme(params.get("theme"));
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  applyTheme(params.get("theme"));
 
-window.addEventListener("message", (event) => {
-  if (event.data?.theme) {
-    applyTheme(event.data.theme);
-  }
+  window.addEventListener("message", (event) => {
+    if (event.data && event.data.theme) {
+      applyTheme(event.data.theme);
+    }
+  });
 });
 
 /* -------------------------------
    STREAM + METADATA
 -------------------------------- */
+const params = new URLSearchParams(window.location.search);
 const streamURL = params.get("stream");
 const metaURL = params.get("meta");
 
@@ -365,9 +370,8 @@ function showFallback() {
   fallbackChip.style.display = "block";
 }
 
-audio.volume = 1.0;
+audio.volume = 0.8;
 </script>
 
 </body>
 </html>
-
