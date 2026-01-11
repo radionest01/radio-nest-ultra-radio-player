@@ -17,15 +17,15 @@
     .theme-dark {
       --text: #000;
       --subtext: rgba(0,0,0,0.7);
-      --glass: rgba(0,0,0,0.18); /* softer tint */
+      --glass: rgba(0,0,0,0.18);
       --title-color: #004a99;
     }
 
     .theme-light {
       --text: #fff;
       --subtext: rgba(255,255,255,0.7);
-      --glass: rgba(255,255,255,0.06); /* softer tint */
-      --title-color: #1374c2; /* your chosen blue */
+      --glass: rgba(255,255,255,0.06);
+      --title-color: #0d4f8b; /* deeper, calmer blue */
     }
 
     body {
@@ -211,6 +211,7 @@
       background: var(--subtext);
     }
 
+    /* Chrome / Edge / Safari */
     .volume-bar::-webkit-slider-thumb {
       width: 14px;
       height: 14px;
@@ -220,6 +221,22 @@
       appearance: none;
       margin-top: -4px;
       box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    }
+
+    /* Firefox */
+    .volume-bar::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      border: none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    }
+
+    .volume-bar::-moz-range-track {
+      height: 4px;
+      background: var(--subtext);
+      border-radius: 999px;
     }
   </style>
 </head>
