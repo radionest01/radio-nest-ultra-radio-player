@@ -9,317 +9,468 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
+    :root {
+      --bg-main: #130f14;
+      --bg-panel: rgba(9, 7, 11, 0.9);
+      --accent-orange: #ff9c35;
+      --accent-blue: #2f80ed;
+      --text-main: #ffffff;
+      --text-sub: #e2dde8;
+      --text-muted: #a49fb0;
+      --error: #ff4b5c;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Montserrat', sans-serif;
-      background: radial-gradient(circle at 20% 0%, rgba(255,180,120,0.35), transparent 60%),
-                  radial-gradient(circle at 80% 100%, rgba(180,120,255,0.25), transparent 60%),
-                  #1a1414;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    }
+
+    body {
       min-height: 100vh;
-      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(255, 191, 130, 0.42), transparent 60%),
+        radial-gradient(circle at 80% 100%, rgba(174, 120, 255, 0.35), transparent 60%),
+        #130f14;
     }
 
-    .player-container {
-      width: 720px;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(12px);
+    .player-shell {
+      width: 100%;
+      max-width: 760px;
+      background: var(--bg-panel);
       border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      padding: 18px 20px 16px;
+      box-shadow: 0 26px 46px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .top-bar {
+    .player-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .brand {
-      color: #2f80ed;
+      font-size: 14px;
       font-weight: 600;
+      color: var(--accent-blue);
       text-decoration: underline;
       cursor: pointer;
-      font-size: 14px;
+      background: none;
+      border: none;
+      padding: 0;
     }
 
-    .onair {
+    .brand:hover,
+    .brand:focus {
+      text-decoration-thickness: 2px;
+    }
+
+    .site-label {
       font-size: 11px;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: #ff9c35;
-      font-weight: 600;
+      color: var(--text-muted);
     }
 
-    .layout {
+    .player-main {
       display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 18px;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 20px;
+      align-items: center;
     }
 
-    .art {
+    /* LEFT: ALBUM ART */
+    .art-wrap {
+      position: relative;
       width: 100%;
-      height: 240px;
+      aspect-ratio: 1 / 1;
       border-radius: 10px;
       overflow: hidden;
+      box-shadow: 0 18px 32px rgba(0, 0, 0, 0.7);
       background: #000;
-      border: 1px solid rgba(255,255,255,0.1);
-      position: relative;
     }
 
-    .art img {
+    .art-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
-    .fallback-tag {
+    .art-overlay {
       position: absolute;
-      bottom: 8px;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.65),
+        rgba(0, 0, 0, 0.15) 45%,
+        transparent
+      );
+      pointer-events: none;
+    }
+
+    .fallback-chip {
+      position: absolute;
       left: 8px;
-      background: rgba(0,0,0,0.6);
-      padding: 4px 8px;
-      border-radius: 6px;
+      bottom: 8px;
+      padding: 3px 7px;
       font-size: 10px;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #ccc;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-muted);
     }
 
-    .meta-area {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    /* RIGHT SIDE */
+    .right-top {
+      margin-bottom: 14px;
     }
 
-    .meta-header {
+    .onair-label {
       font-size: 11px;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #ff9c35;
-      font-weight: 600;
+      color: var(--text-muted);
       margin-bottom: 6px;
     }
 
-    .title {
+    .onair-label span {
+      color: var(--accent-orange);
+      font-weight: 600;
+    }
+
+    .track-title {
       font-size: 26px;
       font-weight: 700;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      letter-spacing: 0.04em;
+      color: var(--text-main);
+      margin-bottom: 3px;
+      min-height: 1.2em;
     }
 
-    .artist {
+    .track-artist {
       font-size: 14px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: #ddd;
-      margin-bottom: 10px;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+      min-height: 1.1em;
     }
 
-    .fallback-text {
+    .track-sub {
       font-size: 12px;
-      color: #aaa;
+      color: var(--text-muted);
     }
 
-    .controls {
+    .controls-row {
       display: flex;
       align-items: center;
       gap: 14px;
+      margin-top: 10px;
     }
 
     .play-btn {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       border: none;
-      background: #fff;
-      color: #000;
+      background: #ffffff;
+      color: #000000;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      font-size: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.7);
+      flex-shrink: 0;
     }
 
-    .volume {
+    .volume-wrap {
       flex: 1;
     }
 
-    .volume input {
+    .volume-bar {
       width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+      cursor: pointer;
     }
 
-    .footer {
-      margin-top: 10px;
-      font-size: 11px;
-      color: #bbb;
+    .volume-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+    }
+
+    .volume-bar::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+    }
+
+    .volume-bar::-moz-range-track {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer-row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      gap: 10px;
     }
 
-    .error {
-      color: #ff4b5c;
+    .meta-status.error {
+      color: var(--error);
+    }
+
+    @media (max-width: 700px) {
+      .player-main {
+        grid-template-columns: 1fr;
+      }
+
+      .art-wrap {
+        max-width: 260px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .player-shell {
+        padding: 14px;
+      }
     }
   </style>
 </head>
-
 <body>
-
-<div class="player-container">
-
-  <div class="top-bar">
-    <div class="brand" onclick="window.open('https://myradionest.com','_blank')">Radio Nest Player</div>
-    <div class="onair">ON AIR • NOW PLAYING</div>
-  </div>
-
-  <div class="layout">
-
-    <div class="art">
-      <img id="albumArt" src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png">
-      <div id="fallbackTag" class="fallback-tag">Radio - Live Stream</div>
+  <div class="player-shell">
+    <div class="player-header">
+      <button
+        class="brand"
+        type="button"
+        onclick="window.open('https://myradionest.com','_blank')"
+      >
+        Radio Nest Player
+      </button>
+      <div class="site-label">
+        Radio Nest • Streaming
+      </div>
     </div>
 
-    <div class="meta-area">
-
-      <div>
-        <div class="meta-header">ON AIR • NOW PLAYING</div>
-        <div id="trackTitle" class="title">Loading...</div>
-        <div id="trackArtist" class="artist"></div>
-        <div id="fallbackText" class="fallback-text">Radio - Live Stream</div>
+    <div class="player-main">
+      <!-- LEFT: ALBUM ART -->
+      <div class="art-wrap">
+        <img
+          id="albumArt"
+          class="art-img"
+          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png"
+          alt="Album art"
+        />
+        <div class="art-overlay"></div>
+        <div id="fallbackChip" class="fallback-chip">Radio - Live Stream</div>
       </div>
 
-      <div class="controls">
-        <button id="playBtn" class="play-btn">Play</button>
-        <div class="volume">
-          <input id="volumeSlider" type="range" min="0" max="100" value="100">
+      <!-- RIGHT: META + CONTROLS -->
+      <div>
+        <div class="right-top">
+          <div class="onair-label">
+            <span>On Air</span> Now Playing
+          </div>
+          <div id="trackTitle" class="track-title">Loading...</div>
+          <div id="trackArtist" class="track-artist"></div>
+          <div id="trackSub" class="track-sub">Radio - Live Stream</div>
+        </div>
+
+        <div class="controls-row">
+          <button id="playBtn" class="play-btn" type="button">Play</button>
+          <div class="volume-wrap">
+            <input
+              id="volumeSlider"
+              type="range"
+              min="0"
+              max="100"
+              value="100"
+              class="volume-bar"
+            />
+          </div>
+        </div>
+
+        <div class="footer-row">
+          <span>Artwork via iTunes Search API</span>
+          <span id="metaStatus" class="meta-status">Updating every 15s</span>
         </div>
       </div>
-
-      <div class="footer">
-        <span>Artwork via iTunes Search API</span>
-        <span id="metaStatus">Updating every 15s</span>
-      </div>
-
     </div>
-
   </div>
 
-</div>
+  <audio id="audioEl"></audio>
 
-<audio id="audio"></audio>
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const streamUrl = params.get("stream") || "";
+      const metaUrl = params.get("meta") || "";
 
-<script>
-(function() {
+      const audio = document.getElementById("audioEl");
+      const playBtn = document.getElementById("playBtn");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const albumArt = document.getElementById("albumArt");
+      const fallbackChip = document.getElementById("fallbackChip");
+      const trackTitleEl = document.getElementById("trackTitle");
+      const trackArtistEl = document.getElementById("trackArtist");
+      const trackSubEl = document.getElementById("trackSub");
+      const metaStatusEl = document.getElementById("metaStatus");
 
-  const params = new URLSearchParams(window.location.search);
-  const stream = params.get("stream") || "";
-  const meta = params.get("meta") || "";
+      const FALLBACK_ART =
+        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+      const FALLBACK_TEXT = "Radio - Live Stream";
 
-  const audio = document.getElementById("audio");
-  const playBtn = document.getElementById("playBtn");
-  const volumeSlider = document.getElementById("volumeSlider");
+      if (streamUrl) {
+        audio.src = streamUrl;
+      }
+      audio.volume = 1.0;
 
-  const albumArt = document.getElementById("albumArt");
-  const fallbackTag = document.getElementById("fallbackTag");
-  const trackTitle = document.getElementById("trackTitle");
-  const trackArtist = document.getElementById("trackArtist");
-  const fallbackText = document.getElementById("fallbackText");
-  const metaStatus = document.getElementById("metaStatus");
+      playBtn.addEventListener("click", () => {
+        if (!audio.src) return;
+        if (audio.paused) {
+          audio
+            .play()
+            .then(() => {
+              playBtn.textContent = "Pause";
+            })
+            .catch((err) => console.error("Playback error:", err));
+        } else {
+          audio.pause();
+          playBtn.textContent = "Play";
+        }
+      });
 
-  const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-  const FALLBACK_TEXT = "Radio - Live Stream";
+      volumeSlider.addEventListener("input", () => {
+        const v = Number(volumeSlider.value || 0);
+        audio.volume = Math.min(Math.max(v / 100, 0), 1);
+      });
 
-  audio.src = stream;
-  audio.volume = 1.0;
+      async function fetchMetadata() {
+        if (!metaUrl) {
+          metaStatusEl.textContent = "No metadata source configured";
+          metaStatusEl.classList.add("error");
+          return;
+        }
 
-  playBtn.addEventListener("click", () => {
-    if (audio.paused) {
-      audio.play();
-      playBtn.textContent = "Stop";
-    } else {
-      audio.pause();
-      playBtn.textContent = "Play";
-    }
-  });
+        metaStatusEl.textContent = "Updating...";
+        metaStatusEl.classList.remove("error");
 
-  volumeSlider.addEventListener("input", () => {
-    audio.volume = volumeSlider.value / 100;
-  });
+        try {
+          const res = await fetch(metaUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const data = await res.json();
 
-  async function updateMetadata() {
-    if (!meta) {
-      metaStatus.textContent = "No metadata source configured";
-      metaStatus.classList.add("error");
-      return;
-    }
+          const artist = (data.artist || "").toString().trim();
+          const title = (data.title || "").toString().trim();
 
-    metaStatus.textContent = "Updating...";
+          if (!artist && !title) {
+            trackTitleEl.textContent = "Loading...";
+            trackArtistEl.textContent = "";
+            trackSubEl.textContent = FALLBACK_TEXT;
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+            fallbackChip.textContent = FALLBACK_TEXT;
+            metaStatusEl.textContent = "No track info in metadata";
+            return;
+          }
 
-    try {
-      const res = await fetch(meta, { cache: "no-store" });
-      const data = await res.json();
+          trackTitleEl.textContent = title || FALLBACK_TEXT;
+          trackArtistEl.textContent = artist || "";
+          trackSubEl.textContent = FALLBACK_TEXT;
 
-      const artist = data.artist || "";
-      const title = data.title || "";
+          await updateArtworkFromItunes(artist, title);
+          metaStatusEl.textContent = "Updated just now";
+        } catch (err) {
+          console.error("Metadata error:", err);
+          metaStatusEl.textContent = "Metadata error";
+          metaStatusEl.classList.add("error");
 
-      if (!artist && !title) {
-        trackTitle.textContent = FALLBACK_TEXT;
-        trackArtist.textContent = "";
-        fallbackText.textContent = FALLBACK_TEXT;
-        albumArt.src = FALLBACK_ART;
-        fallbackTag.style.display = "block";
-        return;
+          if (!trackTitleEl.textContent || trackTitleEl.textContent === "Loading...") {
+            trackTitleEl.textContent = FALLBACK_TEXT;
+            trackSubEl.textContent = FALLBACK_TEXT;
+          }
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+          fallbackChip.textContent = FALLBACK_TEXT;
+        }
       }
 
-      trackTitle.textContent = title;
-      trackArtist.textContent = artist;
-      fallbackText.textContent = FALLBACK_TEXT;
-      fallbackTag.style.display = "none";
+      async function updateArtworkFromItunes(artist, title) {
+        const query = encodeURIComponent(`${artist} ${title}`.trim());
+        if (!query) {
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+          fallbackChip.textContent = FALLBACK_TEXT;
+          return;
+        }
 
-      await updateArtwork(artist, title);
+        const url = `https://itunes.apple.com/search?media=music&limit=1&term=${query}`;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const json = await res.json();
 
-      metaStatus.textContent = "Updated just now";
+          if (!json.results || !json.results.length) {
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+            fallbackChip.textContent = FALLBACK_TEXT;
+            return;
+          }
 
-    } catch (e) {
-      metaStatus.textContent = "Metadata error";
-      metaStatus.classList.add("error");
-      albumArt.src = FALLBACK_ART;
-      fallbackTag.style.display = "block";
-    }
-  }
+          const baseArt = json.results[0].artworkUrl100 || json.results[0].artworkUrl60;
+          if (!baseArt) {
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+            fallbackChip.textContent = FALLBACK_TEXT;
+            return;
+          }
 
-  async function updateArtwork(artist, title) {
-    const query = encodeURIComponent(`${artist} ${title}`);
-    const url = `https://itunes.apple.com/search?media=music&limit=1&term=${query}`;
-
-    try {
-      const res = await fetch(url);
-      const json = await res.json();
-
-      if (!json.results.length) {
-        albumArt.src = FALLBACK_ART;
-        fallbackTag.style.display = "block";
-        return;
+          const hiRes = baseArt.replace(/100x100bb\.jpg|60x60bb\.jpg/, "300x300bb.jpg");
+          albumArt.src = hiRes;
+          fallbackChip.style.display = "none";
+        } catch (err) {
+          console.error("Artwork error:", err);
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+          fallbackChip.textContent = FALLBACK_TEXT;
+        }
       }
 
-      const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
-      albumArt.src = art;
-      fallbackTag.style.display = "none";
-
-    } catch {
-      albumArt.src = FALLBACK_ART;
-      fallbackTag.style.display = "block";
-    }
-  }
-
-  updateMetadata();
-  setInterval(updateMetadata, 15000);
-
-})();
-</script>
-
+      if (metaUrl) {
+        fetchMetadata();
+        setInterval(fetchMetadata, 15000);
+      } else {
+        metaStatusEl.textContent = "No metadata source configured";
+        metaStatusEl.classList.add("error");
+      }
+    })();
+  </script>
 </body>
 </html>
