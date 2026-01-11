@@ -24,7 +24,6 @@
       padding: 0;
     }
 
-    /* PAGE LAYOUT — NOT A WIDGET */
     body {
       min-height: 100vh;
       font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -43,7 +42,6 @@
       margin: 0 auto;
     }
 
-    /* MASTHEAD */
     .masthead {
       display: flex;
       flex-direction: column;
@@ -70,7 +68,6 @@
       color: var(--text-muted);
     }
 
-    /* MAIN PLAYER LAYOUT */
     .player-layout {
       display: grid;
       grid-template-columns: 320px minmax(0, 1fr);
@@ -78,7 +75,6 @@
       align-items: center;
     }
 
-    /* ALBUM ART */
     .art-wrap {
       position: relative;
       width: 100%;
@@ -109,7 +105,6 @@
       color: var(--text-muted);
     }
 
-    /* METADATA */
     .meta-wrap {
       display: flex;
       flex-direction: column;
@@ -153,31 +148,30 @@
       margin-bottom: 18px;
     }
 
-    /* CONTROLS — VERTICAL LIKE MEDIA SITE */
+    /* NEW CONTROLS */
     .controls-block {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .play-btn {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      border: none;
+      width: 120px;
+      height: 36px;
+      border-radius: 8px;
       background: #ffffff;
       color: #000000;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
+      border: none;
       cursor: pointer;
-      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.85);
-      flex-shrink: 0;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
     }
 
     .volume-wrap {
-      width: 100%;
+      width: 170px;
     }
 
     .volume-bar {
@@ -201,7 +195,6 @@
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
     }
 
-    /* FOOTER */
     .footer-row {
       display: flex;
       justify-content: space-between;
@@ -217,7 +210,6 @@
     }
   </style>
 </head>
-
 <body>
   <div class="page-wrap">
 
@@ -260,127 +252,129 @@
   </div>
 
   <audio id="audioEl"></audio>
+<script>
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const streamUrl = params.get("stream") || "";
+    const metaUrl = params.get("meta") || "";
 
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const streamUrl = params.get("stream") || "";
-      const metaUrl = params.get("meta") || "";
+    const audio = document.getElementById("audioEl");
+    const playBtn = document.getElementById("playBtn");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const albumArt = document.getElementById("albumArt");
+    const fallbackChip = document.getElementById("fallbackChip");
+    const trackTitleEl = document.getElementById("trackTitle");
+    const trackArtistEl = document.getElementById("trackArtist");
+    const trackSubEl = document.getElementById("trackSub");
+    const metaStatusEl = document.getElementById("metaStatus");
 
-      const audio = document.getElementById("audioEl");
-      const playBtn = document.getElementById("playBtn");
-      const volumeSlider = document.getElementById("volumeSlider");
-      const albumArt = document.getElementById("albumArt");
-      const fallbackChip = document.getElementById("fallbackChip");
-      const trackTitleEl = document.getElementById("trackTitle");
-      const trackArtistEl = document.getElementById("trackArtist");
-      const trackSubEl = document.getElementById("trackSub");
-      const metaStatusEl = document.getElementById("metaStatus");
+    const FALLBACK_ART =
+      "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+    const FALLBACK_TEXT = "Radio - Live Stream";
 
-      const FALLBACK_ART =
-        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-      const FALLBACK_TEXT = "Radio - Live Stream";
+    if (streamUrl) audio.src = streamUrl;
+    audio.volume = 1.0;
 
-      if (streamUrl) audio.src = streamUrl;
-      audio.volume = 1.0;
+    playBtn.addEventListener("click", () => {
+      if (!audio.src) return;
 
-      playBtn.addEventListener("click", () => {
-        if (!audio.src) return;
-        if (audio.paused) {
-          audio.play().then(() => playBtn.textContent = "Pause");
-        } else {
-          audio.pause();
-          playBtn.textContent = "Play";
-        }
-      });
-
-      volumeSlider.addEventListener("input", () => {
-        audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
-      });
-
-      async function fetchMetadata() {
-        if (!metaUrl) {
-          metaStatusEl.textContent = "No metadata source configured";
-          metaStatusEl.classList.add("error");
-          albumArt.src = FALLBACK_ART;
-          fallbackChip.style.display = "inline-flex";
-          return;
-        }
-
-        metaStatusEl.textContent = "Updating...";
-        metaStatusEl.classList.remove("error");
-
-        try {
-          const res = await fetch(metaUrl, { cache: "no-store" });
-          const data = await res.json();
-
-          const artist = (data.artist || "").trim();
-          const title = (data.title || "").trim();
-
-          if (!artist && !title) {
-            trackTitleEl.textContent = "Loading...";
-            trackArtistEl.textContent = "";
-            trackSubEl.textContent = FALLBACK_TEXT;
-            albumArt.src = FALLBACK_ART;
-            fallbackChip.style.display = "inline-flex";
-            metaStatusEl.textContent = "No metadata";
-            return;
-          }
-
-          trackTitleEl.textContent = title || FALLBACK_TEXT;
-          trackArtistEl.textContent = artist || "";
-          trackSubEl.textContent = FALLBACK_TEXT;
-
-          await updateArtwork(artist, title);
-          metaStatusEl.textContent = "Updated just now";
-
-        } catch {
-          metaStatusEl.textContent = "Metadata error";
-          metaStatusEl.classList.add("error");
-          albumArt.src = FALLBACK_ART;
-          fallbackChip.style.display = "inline-flex";
-        }
-      }
-
-      async function updateArtwork(artist, title) {
-        const q = `${artist} ${title}`.trim();
-        if (!q) {
-          albumArt.src = FALLBACK_ART;
-          fallbackChip.style.display = "inline-flex";
-          return;
-        }
-
-        try {
-          const res = await fetch(
-            `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
-          );
-          const json = await res.json();
-
-          if (!json.results.length) {
-            albumArt.src = FALLBACK_ART;
-            fallbackChip.style.display = "inline-flex";
-            return;
-          }
-
-          const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
-          albumArt.src = art;
-          fallbackChip.style.display = "none";
-
-        } catch {
-          albumArt.src = FALLBACK_ART;
-          fallbackChip.style.display = "inline-flex";
-        }
-      }
-
-      if (metaUrl) {
-        fetchMetadata();
-        setInterval(fetchMetadata, 15000);
+      if (audio.paused) {
+        audio.play().then(() => {
+          playBtn.textContent = "Stop";
+        });
       } else {
+        audio.pause();
+        playBtn.textContent = "Play";
+      }
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
+    });
+
+    async function fetchMetadata() {
+      if (!metaUrl) {
         metaStatusEl.textContent = "No metadata source configured";
         metaStatusEl.classList.add("error");
+        albumArt.src = FALLBACK_ART;
+        fallbackChip.style.display = "inline-flex";
+        return;
       }
-    })();
-  </script>
+
+      metaStatusEl.textContent = "Updating...";
+      metaStatusEl.classList.remove("error");
+
+      try {
+        const res = await fetch(metaUrl, { cache: "no-store" });
+        const data = await res.json();
+
+        const artist = (data.artist || "").trim();
+        const title = (data.title || "").trim();
+
+        if (!artist && !title) {
+          trackTitleEl.textContent = "Loading...";
+          trackArtistEl.textContent = "";
+          trackSubEl.textContent = FALLBACK_TEXT;
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+          metaStatusEl.textContent = "No metadata";
+          return;
+        }
+
+        trackTitleEl.textContent = title || FALLBACK_TEXT;
+        trackArtistEl.textContent = artist || "";
+        trackSubEl.textContent = FALLBACK_TEXT;
+
+        await updateArtwork(artist, title);
+        metaStatusEl.textContent = "Updated just now";
+
+      } catch {
+        metaStatusEl.textContent = "Metadata error";
+        metaStatusEl.classList.add("error");
+        albumArt.src = FALLBACK_ART;
+        fallbackChip.style.display = "inline-flex";
+      }
+    }
+
+    async function updateArtwork(artist, title) {
+      const q = `${artist} ${title}`.trim();
+      if (!q) {
+        albumArt.src = FALLBACK_ART;
+        fallbackChip.style.display = "inline-flex";
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
+        );
+        const json = await res.json();
+
+        if (!json.results.length) {
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+          return;
+        }
+
+        const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
+        albumArt.src = art;
+        fallbackChip.style.display = "none";
+
+      } catch {
+        albumArt.src = FALLBACK_ART;
+        fallbackChip.style.display = "inline-flex";
+      }
+    }
+
+    if (metaUrl) {
+      fetchMetadata();
+      setInterval(fetchMetadata, 15000);
+    } else {
+      metaStatusEl.textContent = "No metadata source configured";
+      metaStatusEl.classList.add("error");
+    }
+  })();
+</script>
 
 </body>
 </html>
