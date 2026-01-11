@@ -15,7 +15,7 @@ body{
   min-height:680px;
   display:flex;
   align-items:stretch;
-  overflow:hidden;
+  justify-content:center;
 }
 
 .player-page{
@@ -27,6 +27,7 @@ body{
   border-radius:18px;
   backdrop-filter:blur(10px);
   box-shadow:0 24px 60px rgba(0,0,0,0.6);
+  overflow:hidden;
 }
 
 .top-bar{
@@ -66,7 +67,6 @@ body{
   display:block;
   transition:opacity .4s ease-in-out;
 }
-
 .artwork-text{margin-top:14px}
 .artist-name{
   text-transform:uppercase;
@@ -249,6 +249,10 @@ const params = new URLSearchParams(window.location.search);
 const streamUrl = params.get("stream");
 const metaUrl = params.get("meta");
 
+/* Debug (you can remove later) */
+console.log("STREAM URL:", streamUrl);
+console.log("META URL:", metaUrl);
+
 /* DOM */
 const audio = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playPauseBtn");
@@ -264,7 +268,11 @@ const FALLBACK_TITLE = "Radio";
 const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
 
 /* Apply stream */
-if (streamUrl) audio.src = streamUrl;
+if (streamUrl) {
+  audio.src = streamUrl;
+} else {
+  console.warn("No stream URL provided (?stream=...)");
+}
 
 /* Volume */
 audio.volume = 1;
@@ -275,13 +283,18 @@ volumeSlider.addEventListener("input", () => {
 /* PLAY / STOP */
 let isPlaying = false;
 playBtn.addEventListener("click", async () => {
+  if (!streamUrl) {
+    console.warn("No stream URL set, cannot play.");
+    return;
+  }
+
   if (!isPlaying) {
     try {
       await audio.play();
       isPlaying = true;
       playBtn.textContent = "STOP";
     } catch (e) {
-      console.log("Playback blocked:", e);
+      console.log("Playback error:", e);
     }
   } else {
     audio.pause();
@@ -304,6 +317,7 @@ function splitArtistTitle(str) {
 function parseMetadata(data) {
   if (!data) return {};
 
+  // Icecast-style
   if (data.icestats && data.icestats.source) {
     const src = Array.isArray(data.icestats.source)
       ? data.icestats.source[0]
@@ -311,15 +325,20 @@ function parseMetadata(data) {
     return splitArtistTitle(src.title || "");
   }
 
-  if (data.songtitle) return splitArtistTitle(data.songtitle);
+  // Shoutcast-style
+  if (data.songtitle) {
+    return splitArtistTitle(data.songtitle);
+  }
 
+  // AzuraCast-style
   if (data.now_playing && data.now_playing.song) {
     return {
       artist: data.now_playing.song.artist || "",
-      title: data.now_now_playing.song.title || ""
+      title: data.now_playing.song.title || ""
     };
   }
 
+  // Generic { song: { artist, title } }
   if (data.song && data.song.title) {
     return {
       artist: data.song.artist || "",
@@ -327,7 +346,10 @@ function parseMetadata(data) {
     };
   }
 
-  if (data.title && data.artist) return { artist: data.artist, title: data.title };
+  // Generic { title, artist }
+  if (data.title && data.artist) {
+    return { artist: data.artist, title: data.title };
+  }
 
   if (data.title) return splitArtistTitle(data.title);
   if (data.song) return splitArtistTitle(data.song);
@@ -339,13 +361,13 @@ function parseMetadata(data) {
 function cleanForSearch(str) {
   if (!str) return "";
   let s = str;
-  s = s.replace(/\(.*?\)/g, "");
+  s = s.replace(/\(.*?\)/g, ""); // remove (Live), (Remastered), etc.
   s = s.replace(/
 
 \[.*?\]
 
-/g, "");
-  s = s.replace(/\s+/g, " ");
+/g, ""); // remove [2023 Version], etc.
+  s = s.replace(/\s+/g, " ");   // collapse spaces
   return s.trim();
 }
 
@@ -415,7 +437,10 @@ async function fetchAlbumArt(artist, title) {
 
 /* Metadata updater */
 async function updateMetadata() {
-  if (!metaUrl) return;
+  if (!metaUrl) {
+    console.warn("No metadata URL provided (?meta=...)");
+    return;
+  }
 
   try {
     const res = await fetch(metaUrl);
