@@ -1,470 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Radio Nest Player</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Radio Nest Ultra Radio Player</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  <style>
+    * { box-sizing: border-box; }
 
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #f4d2b8 0%, #3b2520 55%, #140e0e 100%);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-}
-
-/* Outer card */
-.player-shell {
-  width: 100%;
-  max-width: 900px;
-  background: rgba(10, 6, 6, 0.9);
-  border-radius: 18px;
-  padding: 20px 24px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
-  overflow: hidden;
-}
-
-/* Top brand bar */
-.player-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.player-brand {
-  font-size: 13px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: #4da3ff;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.player-brand:hover {
-  opacity: 0.85;
-}
-
-/* Main layout: artwork left, info right */
-.player-main {
-  display: grid;
-  grid-template-columns: 1.1fr 1.4fr;
-  gap: 24px;
-}
-
-/* Artwork side */
-.artwork-wrap {
-  background: linear-gradient(145deg, #3a2626, #74433a);
-  border-radius: 16px;
-  padding: 12px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
-}
-
-.artwork-img {
-  width: 100%;
-  border-radius: 12px;
-  display: block;
-}
-
-.artwork-caption {
-  margin-top: 10px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  opacity: 0.85;
-}
-
-/* Right side info */
-.info-wrap {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Now playing text */
-.now-label {
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  opacity: 0.85;
-  margin-bottom: 6px;
-}
-
-.now-title {
-  font-size: 28px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
-}
-
-.now-artist {
-  font-size: 15px;
-  opacity: 0.85;
-}
-
-/* Controls row */
-.controls-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-top: 22px;
-  flex-wrap: wrap;
-}
-
-/* Play/Pause button */
-.play-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 10px 30px;
-  font-size: 13px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 600;
-  background: linear-gradient(135deg, #f5b98a, #f0764b);
-  color: #1b0f0d;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.6);
-}
-
-.play-btn:hover {
-  transform: translateY(-1px);
-  opacity: 0.96;
-}
-
-.play-btn:active {
-  transform: translateY(1px);
-}
-
-/* Volume */
-.volume-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 11px;
-  opacity: 0.9;
-}
-
-#volumeSlider {
-  width: 160px;
-}
-
-/* Range styling */
-input[type=range] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #f5b98a;
-  border: 2px solid #1b0f0d;
-  margin-top: -5px;
-}
-
-input[type=range]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #f5b98a;
-  border: 2px solid #1b0f0d;
-}
-
-input[type=range]::-moz-range-track {
-  height: 6px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 999px;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 720px) {
-  .player-shell {
-    border-radius: 0;
-    max-width: 100%;
-    height: 100vh;
-  }
-
-  .player-main {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .info-wrap {
-    justify-content: flex-start;
-  }
-
-  .now-title {
-    font-size: 22px;
-  }
-
-  #volumeSlider {
-    width: 140px;
-  }
-}
-</style>
-</head>
-<body>
-
-<div class="player-shell">
-  <header class="player-header">
-    <a href="https://myradionest.com" target="_blank" rel="noopener" class="player-brand">
-      RADIO NEST PLAYER
-    </a>
-  </header>
-
-  <main class="player-main">
-
-    <!-- Left: artwork -->
-    <section class="artwork-wrap">
-      <img
-        id="albumArt"
-        class="artwork-img"
-        src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png"
-        alt="Album art" />
-      <div class="artwork-caption" id="artworkCaption">
-        Radio – Live Stream
-      </div>
-    </section>
-
-    <!-- Right: now playing + controls -->
-    <section class="info-wrap">
-      <div>
-        <div class="now-label">ON AIR NOW PLAYING</div>
-        <div class="now-title" id="trackTitle">Radio</div>
-        <div class="now-artist" id="trackArtist">Live Stream</div>
-
-        <div class="controls-row">
-          <button id="playPauseBtn" class="play-btn">PLAY</button>
-
-          <div class="volume-block">
-            <span>VOLUME</span>
-            <input
-              type="range"
-              id="volumeSlider"
-              min="0"
-              max="1"
-              step="0.01"
-              value="1" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <audio id="audioPlayer"></audio>
-</div>
-
-<script>
-/* --- PARAMS: ?stream= & ?meta= --- */
-const params   = new URLSearchParams(window.location.search);
-const streamUrl = params.get("stream");
-const metaUrl   = params.get("meta");
-
-/* --- DOM refs --- */
-const audio        = document.getElementById("audioPlayer");
-const playBtn      = document.getElementById("playPauseBtn");
-const volumeSlider = document.getElementById("volumeSlider");
-const trackTitleEl = document.getElementById("trackTitle");
-const trackArtistEl= document.getElementById("trackArtist");
-const albumArtEl   = document.getElementById("albumArt");
-const artworkCaptionEl = document.getElementById("artworkCaption");
-
-/* --- Fallbacks --- */
-const FALLBACK_TITLE = "Radio";
-const FALLBACK_ARTIST = "Live Stream";
-const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-
-/* --- Basic setup --- */
-if (streamUrl) {
-  audio.src = streamUrl;
-}
-
-audio.volume = 1;
-volumeSlider.addEventListener("input", () => {
-  audio.volume = parseFloat(volumeSlider.value);
-});
-
-/* --- Play / Pause --- */
-let isPlaying = false;
-
-playBtn.addEventListener("click", async () => {
-  if (!streamUrl) return;
-
-  if (!isPlaying) {
-    try {
-      await audio.play();
-      isPlaying = true;
-      playBtn.textContent = "PAUSE";
-    } catch (e) {}
-  } else {
-    audio.pause();
-    isPlaying = false;
-    playBtn.textContent = "PLAY";
-  }
-});
-
-/* --- Metadata parsing --- */
-function splitArtistTitle(str) {
-  if (!str) return { artist: "", title: "" };
-  const parts = str.split(" - ");
-  return {
-    artist: (parts[0] || "").trim(),
-    title: (parts[1] || "").trim()
-  };
-}
-
-function parseMetadata(data) {
-  if (!data) return {};
-
-  if (data.icestats && data.icestats.source) {
-    const src = Array.isArray(data.icestats.source)
-      ? data.icestats.source[0]
-      : data.icestats.source;
-    return splitArtistTitle(src.title || "");
-  }
-
-  if (data.songtitle) {
-    return splitArtistTitle(data.songtitle);
-  }
-
-  if (data.now_playing && data.now_playing.song) {
-    return {
-      artist: data.now_playing.song.artist || "",
-      title:  data.now_playing.song.title  || ""
-    };
-  }
-
-  if (data.song && data.song.title) {
-    return {
-      artist: data.song.artist || "",
-      title:  data.song.title  || ""
-    };
-  }
-
-  if (data.title && data.artist) {
-    return {
-      artist: data.artist,
-      title:  data.title
-    };
-  }
-
-  if (data.title) return splitArtistTitle(data.title);
-  if (data.song)  return splitArtistTitle(data.song);
-
-  return {};
-}
-
-/* --- Clean strings for iTunes search --- */
-function cleanForSearch(str) {
-  if (!str) return "";
-  let s = str;
-  s = s.replace(/\(.*?\)/g, "");
-  s = s.replace(/
-
-\[.*?\]
-
-/g, "");
-  s = s.replace(/\s+/g, " ");
-  return s.trim();
-}
-
-/* --- Artwork lookup --- */
-async function fetchAlbumArt(artist, title) {
-  const cleanArtist = cleanForSearch(artist);
-  const cleanTitle  = cleanForSearch(title);
-
-  if (!cleanArtist || !cleanTitle) {
-    albumArtEl.src = FALLBACK_ART;
-    return;
-  }
-
-  const query = `${cleanArtist} ${cleanTitle}`.trim();
-
-  try {
-    const res = await fetch(
-      "https://itunes.apple.com/search?term=" +
-      encodeURIComponent(query) +
-      "&media=music&entity=song&limit=3"
-    );
-    const data = await res.json();
-
-    if (!data.results || data.results.length === 0) {
-      albumArtEl.src = FALLBACK_ART;
-      return;
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(120deg, #c8a38a, #5b3422);
+      color: #fff;
     }
 
-    const targetArtist = cleanArtist.toLowerCase();
-    const targetTitle  = cleanTitle.toLowerCase();
+    .player {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 20px;
+      align-items: center;
+    }
 
-    let best = null;
+    .artwork {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,.35);
+    }
 
-    for (const item of data.results) {
-      const resArtist = (item.artistName || "").toLowerCase();
-      const resTitle  = (item.trackName  || "").toLowerCase();
+    .artwork img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-      const artistMatches =
-        resArtist.includes(targetArtist) || targetArtist.includes(resArtist);
-      const titleMatches =
-        resTitle.includes(targetTitle)   || targetTitle.includes(resTitle);
+    .meta small {
+      display: inline-block;
+      background: #ff4d00;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
 
-      if (artistMatches && titleMatches) {
-        best = item;
-        break;
+    .meta h1 {
+      font-size: 28px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .meta h2 {
+      font-size: 16px;
+      margin: 6px 0 20px;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    input[type=range] {
+      flex: 1;
+    }
+
+    @media (max-width: 700px) {
+      .player {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .controls {
+        flex-direction: column;
       }
     }
+  </style>
+</head>
 
-    if (!best || !best.artworkUrl100) {
-      albumArtEl.src = FALLBACK_ART;
-      return;
+<body>
+
+<div class="player">
+  <div class="artwork">
+    <img id="artwork" src="https://via.placeholder.com/600" />
+  </div>
+
+  <div class="meta">
+    <small>ON AIR</small>
+    <h1 id="title">Radio Nest Ultra</h1>
+    <h2 id="artist">Live Stream</h2>
+
+    <div class="controls">
+      <button id="play">Play</button>
+      <input type="range" min="0" max="1" step="0.01" value="1" id="volume" />
+    </div>
+  </div>
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const streamUrl = params.get('stream');
+  const metaUrl = params.get('meta');
+
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('play');
+  const volume = document.getElementById('volume');
+  const title = document.getElementById('title');
+  const artist = document.getElementById('artist');
+  const artwork = document.getElementById('artwork');
+
+  if (streamUrl) audio.src = streamUrl;
+
+  playBtn.onclick = () => {
+    if (audio.paused) {
+      audio.play();
+      playBtn.textContent = 'Pause';
+    } else {
+      audio.pause();
+      playBtn.textContent = 'Play';
     }
+  };
 
-    let art = best.artworkUrl100;
-    art = art.replace("100x100", "600x600");
-    albumArtEl.src = art;
-  } catch (e) {
-    albumArtEl.src = FALLBACK_ART;
+  volume.oninput = e => audio.volume = e.target.value;
+
+  async function updateMeta() {
+    if (!metaUrl) return;
+
+    try {
+      const res = await fetch(metaUrl);
+      const data = await res.json();
+
+      title.textContent = data.title || 'Live Stream';
+      artist.textContent = data.artist || '';
+
+      const term = encodeURIComponent(`${data.artist} ${data.title}`);
+      const itunes = await fetch(`https://itunes.apple.com/search?term=${term}&media=music&limit=1`);
+      const itunesData = await itunes.json();
+
+      if (itunesData.results.length) {
+        artwork.src = itunesData.results[0].artworkUrl100.replace('100x100', '600x600');
+      }
+    } catch (e) {
+      console.warn('Metadata error', e);
+    }
   }
-}
 
-/* --- Metadata updater --- */
-async function updateMetadata() {
-  if (!metaUrl) return;
-
-  try {
-    const res  = await fetch(metaUrl);
-    const data = await res.json();
-
-    const { artist, title } = parseMetadata(data);
-
-    const safeTitle  = title  || FALLBACK_TITLE;
-    const safeArtist = artist || FALLBACK_ARTIST;
-
-    trackTitleEl.textContent     = safeTitle;
-    trackArtistEl.textContent    = safeArtist;
-    artworkCaptionEl.textContent = `${safeArtist} – ${safeTitle}`;
-
-    fetchAlbumArt(safeArtist, safeTitle);
-  } catch (e) {}
-}
-
-/* Start metadata polling */
-updateMetadata();
-setInterval(updateMetadata, 30000);
+  updateMeta();
+  setInterval(updateMeta, 15000);
 </script>
+
 </body>
 </html>
