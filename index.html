@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Radio Nest Player</title>
+<title>Radio Nest Ultra Player</title>
 
 <style>
-/* --- CSS (inline) --- */
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -31,7 +30,9 @@ body{
   background:linear-gradient(145deg,#362225,#74433a);border-radius:18px;
   padding:16px;box-shadow:0 18px 40px rgba(0,0,0,0.7);
 }
-.artwork-img{width:100%;border-radius:12px;display:block}
+.artwork-img{width:100%;border-radius:12px;display:block;transition:opacity .4s}
+.fade-out{opacity:0}
+
 .artwork-text{margin-top:14px}
 .artist-name{text-transform:uppercase;letter-spacing:.18em;opacity:.8;font-size:14px}
 .album-title{font-size:20px;font-weight:600;margin-top:4px}
@@ -119,16 +120,14 @@ input[type=range]::-webkit-slider-thumb{
 </div>
 
 <script>
-/* --- JavaScript (inline) --- */
-
-// Read URL parameters
+/* URL parameters */
 const params = new URLSearchParams(window.location.search);
 const streamUrl = params.get("stream");
 const metaUrl = params.get("meta");
 
-// DOM elements
+/* DOM */
 const audio = document.getElementById("audioPlayer");
-const playPauseBtn = document.getElementById("playPauseBtn");
+const playBtn = document.getElementById("playPauseBtn");
 const volumeSlider = document.getElementById("volumeSlider");
 const trackTitle = document.getElementById("trackTitle");
 const trackArtist = document.getElementById("trackArtist");
@@ -136,77 +135,142 @@ const albumArt = document.getElementById("albumArt");
 const albumArtistLabel = document.getElementById("albumArtistLabel");
 const albumTitleLabel = document.getElementById("albumTitleLabel");
 
-// Fallbacks
+/* Fallbacks */
 const FALLBACK_TITLE = "Radio";
 const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
 
-// Set stream
-if (streamUrl) audio.src = streamUrl;
+/* Apply stream directly */
+if (streamUrl) {
+  audio.src = streamUrl;
+}
 
-// Volume
+/* Volume */
 audio.volume = parseFloat(volumeSlider.value);
 volumeSlider.addEventListener("input", () => {
   audio.volume = parseFloat(volumeSlider.value);
 });
 
-// Play/pause
-playPauseBtn.addEventListener("click", async () => {
-  if (audio.paused) {
-    await audio.play();
-    playPauseBtn.textContent = "PAUSE";
+/* PLAY / STOP */
+let isPlaying = false;
+
+playBtn.addEventListener("click", async () => {
+  if (!isPlaying) {
+    try {
+      await audio.play();
+      isPlaying = true;
+      playBtn.textContent = "STOP";
+    } catch (e) {
+      console.log("Playback blocked:", e);
+    }
   } else {
     audio.pause();
-    playPauseBtn.textContent = "PLAY";
+    audio.currentTime = 0;
+    isPlaying = false;
+    playBtn.textContent = "PLAY";
   }
 });
 
-// Fallback function
-function applyFallback() {
-  trackTitle.textContent = FALLBACK_TITLE;
-  trackArtist.textContent = "";
-  albumArtistLabel.textContent = FALLBACK_TITLE;
-  albumTitleLabel.textContent = "Live Stream";
-  albumArt.src = FALLBACK_ART;
+/* Universal metadata parser */
+function parseMetadata(data) {
+  if (!data) return {};
+
+  /* Icecast */
+  if (data.icestats && data.icestats.source) {
+    const src = Array.isArray(data.icestats.source)
+      ? data.icestats.source[0]
+      : data.icestats.source;
+    return splitArtistTitle(src.title);
+  }
+
+  /* Shoutcast v2 */
+  if (data.songtitle) {
+    return splitArtistTitle(data.songtitle);
+  }
+
+  /* AzuraCast */
+  if (data.now_playing && data.now_playing.song) {
+    return {
+      artist: data.now_playing.song.artist || "",
+      title: data.now_playing.song.title || ""
+    };
+  }
+
+  /* Centova */
+  if (data.song && data.song.title) {
+    return {
+      artist: data.song.artist || "",
+      title: data.song.title || ""
+    };
+  }
+
+  /* Generic */
+  if (data.title && data.artist) {
+    return { artist: data.artist, title: data.title };
+  }
+
+  /* Fallback */
+  return splitArtistTitle(data.title || data.song || "");
 }
 
-// Metadata fetch
+function splitArtistTitle(str) {
+  if (!str) return { artist: "", title: "" };
+  const parts = str.split(" - ");
+  return {
+    artist: parts[0]?.trim() || "",
+    title: parts[1]?.trim() || ""
+  };
+}
+
+/* Metadata updater */
 async function updateMetadata() {
-  if (!metaUrl) return applyFallback();
+  if (!metaUrl) return;
 
   try {
     const res = await fetch(metaUrl);
     const data = await res.json();
 
-    const title = (data.title || data.song || "").trim();
-    const artist = (data.artist || data.performer || "").trim();
-
-    if (!title && !artist) return applyFallback();
+    const { artist, title } = parseMetadata(data);
 
     trackTitle.textContent = title || FALLBACK_TITLE;
     trackArtist.textContent = artist || "";
     albumArtistLabel.textContent = artist || FALLBACK_TITLE;
     albumTitleLabel.textContent = title || FALLBACK_TITLE;
 
-    // iTunes lookup
-    const searchTerm = encodeURIComponent(`${artist} ${title}`.trim());
-    const itunesRes = await fetch(`https://itunes.apple.com/search?term=${searchTerm}&limit=1`);
-    const itunesData = await itunesRes.json();
+    fetchAlbumArt(artist, title);
 
-    if (itunesData.results.length > 0) {
-      const art = itunesData.results[0].artworkUrl100.replace("100x100", "600x600");
+  } catch (e) {
+    console.log("Metadata error:", e);
+  }
+}
+
+/* iTunes artwork */
+async function fetchAlbumArt(artist, title) {
+  const q = encodeURIComponent(`${artist} ${title}`.trim());
+  if (!q) {
+    albumArt.src = FALLBACK_ART;
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://itunes.apple.com/search?term=${q}&limit=1`);
+    const data = await res.json();
+
+    if (data.results.length > 0) {
+      const art = data.results[0].artworkUrl100.replace("100x100", "600x600");
       albumArt.src = art;
     } else {
       albumArt.src = FALLBACK_ART;
     }
-
-  } catch (e) {
-    applyFallback();
+  } catch {
+    albumArt.src = FALLBACK_ART;
   }
 }
 
+/* Run metadata every 30s */
 updateMetadata();
 setInterval(updateMetadata, 30000);
 </script>
 
 </body>
 </html>
+
