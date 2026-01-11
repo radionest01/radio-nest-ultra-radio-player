@@ -50,21 +50,25 @@
       overflow: hidden;
     }
 
+    /* DESKTOP CONTAINER */
     .page-wrap {
       position: relative;
       z-index: 2;
       width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      padding: 10px 50px 40px 50px;
+      padding: 20px 40px;
       box-sizing: border-box;
       overflow: hidden;
     }
 
     .masthead {
       margin-bottom: 20px;
+      text-align: left;
     }
 
     .masthead-title {
@@ -85,12 +89,13 @@
       color: var(--subtext);
     }
 
+    /* DESKTOP LAYOUT */
     .player-layout {
       display: flex;
+      flex-direction: row;
       gap: 40px;
       align-items: flex-start;
-      flex-wrap: nowrap;
-      overflow: hidden;
+      width: 100%;
     }
 
     .art-wrap {
@@ -99,7 +104,6 @@
       overflow: hidden;
       position: relative;
       box-shadow: 0 22px 40px rgba(0,0,0,0.5);
-      flex-shrink: 0;
       border-radius: 12px;
     }
 
@@ -108,6 +112,12 @@
       height: 100%;
       object-fit: cover;
       border-radius: 12px;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    .art-img.fade {
+      opacity: 0;
     }
 
     .fallback-chip {
@@ -124,15 +134,12 @@
       display: none;
     }
 
-    .theme-light .fallback-chip {
-      background: rgba(255,255,255,0.5);
-      color: #000;
-    }
-
     .meta-wrap {
       flex: 1;
       display: flex;
       flex-direction: column;
+      text-align: left;
+      align-items: flex-start;
       overflow: hidden;
     }
 
@@ -180,12 +187,6 @@
       margin-bottom: 18px;
     }
 
-    .controls-block {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
     .play-btn {
       width: 140px;
       height: 42px;
@@ -197,6 +198,7 @@
       background: #fff;
       color: #000;
       box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+      margin-bottom: 15px;
     }
 
     .volume-wrap {
@@ -213,40 +215,9 @@
       background: var(--subtext);
     }
 
-    .volume-bar::-webkit-slider-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #fff;
-      -webkit-appearance: none;
-      appearance: none;
-      margin-top: -4px;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-    }
-
-    .volume-bar::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #fff;
-      border: none;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-    }
-
-    .volume-bar::-moz-range-track {
-      height: 4px;
-      background: var(--subtext);
-      border-radius: 999px;
-    }
-
-    /* MOBILE + TABLET LAYOUT */
+    /* MOBILE + TABLET */
     @media (max-width: 1024px) {
 
-      .page-wrap {
-        padding: 20px;
-      }
-
-      /* Centre masthead */
       .masthead {
         text-align: center;
       }
@@ -268,37 +239,17 @@
       .meta-wrap {
         text-align: center;
         align-items: center;
-        order: 4;
         width: 100%;
-        max-width: 500px; /* FIX: prevents clipping */
+        max-width: 500px;
       }
 
       .art-wrap {
         width: 100%;
         max-width: 350px;
-        order: 5;
       }
 
       .play-btn {
         margin: 0 auto;
-        order: 2;
-      }
-
-      .onair-label {
-        order: 3;
-      }
-
-      .track-title {
-        order: 4;
-        font-size: 24px;
-      }
-
-      .track-artist {
-        order: 4;
-      }
-
-      .track-sub {
-        order: 4;
       }
 
       .volume-wrap {
@@ -315,29 +266,29 @@
   <div class="page-wrap">
 
     <div class="masthead">
-      <button class="masthead-title" onclick="location.reload()">RADIO NEST ULTRA PLAYER</button>
+      <button class="masthead-title" onclick="window.open('https://myradionest.com', '_blank')">RADIO NEST ULTRA PLAYER</button>
       <div class="masthead-sub">Everything Radio — All in One Nest.</div>
     </div>
 
     <div class="player-layout">
-
-      <button id="playButton" class="play-btn">PLAY</button>
-
-      <div class="onair-label"><span>●</span> NOW PLAYING</div>
-
-      <div class="meta-wrap">
-        <div id="trackTitle" class="track-title">Loading…</div>
-        <div id="trackArtist" class="track-artist"></div>
-        <div id="trackSub" class="track-sub"></div>
-      </div>
 
       <div class="art-wrap">
         <img id="artwork" class="art-img" src="" alt="">
         <div id="fallbackChip" class="fallback-chip">NO ARTWORK</div>
       </div>
 
-      <div class="volume-wrap">
-        <input id="volumeBar" class="volume-bar" type="range" min="0" max="100" value="100">
+      <div class="meta-wrap">
+        <div class="onair-label"><span>●</span> NOW PLAYING</div>
+
+        <div id="trackTitle" class="track-title">Loading…</div>
+        <div id="trackArtist" class="track-artist"></div>
+        <div id="trackSub" class="track-sub"></div>
+
+        <button id="playButton" class="play-btn">PLAY</button>
+
+        <div class="volume-wrap">
+          <input id="volumeBar" class="volume-bar" type="range" min="0" max="100" value="100">
+        </div>
       </div>
 
     </div>
@@ -389,12 +340,17 @@ function applyFallbackMetadata() {
   titleEl.textContent = "Radio - Live Stream";
   artistEl.textContent = "";
   subEl.textContent = "";
-  artworkEl.src = FALLBACK_ART;
-  fallbackChip.style.display = "none";
+  showFallback();
 }
 
 function showFallback() {
-  artworkEl.src = FALLBACK_ART;
+  if (artworkEl.src !== FALLBACK_ART) {
+    artworkEl.classList.add("fade");
+    setTimeout(() => {
+      artworkEl.src = FALLBACK_ART;
+      artworkEl.classList.remove("fade");
+    }, 200);
+  }
   fallbackChip.style.display = "none";
 }
 
@@ -472,7 +428,15 @@ async function updateArtwork(title, artist) {
     if (data.results && data.results.length > 0) {
       let art = data.results[0].artworkUrl100;
       art = art.replace("100x100bb.jpg", "1200x1200bb.jpg");
-      artworkEl.src = art;
+
+      if (artworkEl.src !== art) {
+        artworkEl.classList.add("fade");
+        setTimeout(() => {
+          artworkEl.src = art;
+          artworkEl.classList.remove("fade");
+        }, 200);
+      }
+
       fallbackChip.style.display = "none";
     } else {
       showFallback();
