@@ -56,14 +56,12 @@
       overflow: hidden;
     }
 
-    /* Fallback if backdrop-filter not supported */
     @supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
       .glass-bg {
         background: rgba(0, 0, 0, 0.6);
       }
     }
 
-    /* DESKTOP CONTAINER */
     .page-wrap {
       position: relative;
       z-index: 2;
@@ -102,7 +100,6 @@
       color: var(--subtext);
     }
 
-    /* DESKTOP LAYOUT */
     .player-layout {
       display: flex;
       flex-direction: row;
@@ -117,7 +114,6 @@
       box-shadow: 0 22px 40px rgba(0,0,0,0.5);
       border-radius: 12px;
       overflow: hidden;
-      /* aspect-ratio fallback */
       width: 400px;
       height: 400px;
     }
@@ -180,29 +176,15 @@
       color: #ff9c35;
     }
 
-    .track-title,
-    .track-artist,
-    .track-sub {
-      white-space: normal;
-      overflow: visible;
-      text-overflow: unset;
-      word-break: break-word;
-    }
-
-    .track-artist {
-      font-size: clamp(14px, 2vw, 16px);
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      margin-bottom: 6px;
-      color: var(--subtext);
-    }
-
     .track-title {
       font-size: clamp(28px, 4vw, 36px);
       font-weight: 700;
       text-transform: uppercase;
       margin-bottom: 10px;
       color: var(--text);
+      white-space: normal;
+      overflow: visible;
+      word-break: break-word;
     }
 
     .track-sub {
@@ -225,7 +207,6 @@
       margin-bottom: 15px;
     }
 
-    /* STYLISH & CROSS-BROWSER VOLUME SLIDER */
     .volume-wrap {
       width: 220px;
     }
@@ -241,14 +222,12 @@
       appearance: none;
     }
 
-    /* WebKit track */
     .volume-bar::-webkit-slider-runnable-track {
       height: 6px;
       border-radius: 999px;
       background: var(--slider-track);
     }
 
-    /* WebKit thumb */
     .volume-bar::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -259,7 +238,7 @@
       box-shadow: 0 0 10px var(--slider-thumb-glow);
       -webkit-box-shadow: 0 0 10px var(--slider-thumb-glow);
       border: none;
-      margin-top: -6px; /* centers thumb on track */
+      margin-top: -6px;
       -webkit-transition: -webkit-transform 0.2s ease, box-shadow 0.2s ease;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -271,14 +250,12 @@
       -webkit-box-shadow: 0 0 14px var(--slider-thumb-glow);
     }
 
-    /* Firefox track */
     .volume-bar::-moz-range-track {
       height: 6px;
       border-radius: 999px;
       background: var(--slider-track);
     }
 
-    /* Firefox thumb */
     .volume-bar::-moz-range-thumb {
       width: 18px;
       height: 18px;
@@ -294,12 +271,10 @@
       box-shadow: 0 0 14px var(--slider-thumb-glow);
     }
 
-    /* Remove Firefox inner border */
     .volume-bar::-moz-focus-outer {
       border: 0;
     }
 
-    /* MOBILE + TABLET */
     @media (max-width: 1024px) {
 
       .page-wrap {
@@ -333,13 +308,11 @@
         flex-direction: column;
       }
 
-      /* MOBILE ORDERING */
       .onair-label { order: 1; }
-      .track-artist { order: 2; }
-      .track-title { order: 3; }
-      .track-sub   { order: 4; }
-      .play-btn    { order: 5; }
-      .art-wrap    { order: 6; }
+      .track-title { order: 2; }
+      .track-sub   { order: 3; }
+      .play-btn    { order: 4; }
+      .art-wrap    { order: 5; }
 
       .art-wrap {
         width: 100%;
@@ -377,7 +350,6 @@
       <div class="meta-wrap">
         <div class="onair-label"><span>●</span> NOW PLAYING</div>
 
-        <div id="trackArtist" class="track-artist"></div>
         <div id="trackTitle" class="track-title">Loading…</div>
         <div id="trackSub" class="track-sub"></div>
 
@@ -424,7 +396,6 @@ const playButton = document.getElementById("playButton");
 const volumeBar = document.getElementById("volumeBar");
 
 const titleEl = document.getElementById("trackTitle");
-const artistEl = document.getElementById("trackArtist");
 const subEl = document.getElementById("trackSub");
 
 const artworkEl = document.getElementById("artwork");
@@ -435,7 +406,6 @@ const FALLBACK_ART =
 
 function applyFallbackMetadata() {
   titleEl.textContent = "Live Stream";
-  artistEl.textContent = "Radio";
   subEl.textContent = "";
   showFallback();
 }
@@ -484,22 +454,19 @@ async function fetchMetadata() {
     if (Array.isArray(source)) source = source[0];
     source = source || {};
 
-    const title = source.title;
-    const artist = source.artist;
-    const album = source.album;
+    let raw = source.title || "";
 
-    if (!title && !artist) {
+    if (!raw.trim()) {
       applyFallbackMetadata();
       return;
     }
 
-    artistEl.textContent = artist || "Unknown Artist";
-    titleEl.textContent = title || "Unknown Title";
-    subEl.textContent = album || "";
+    titleEl.textContent = raw.trim();
+    subEl.textContent = "";
 
-    updateArtwork(title, artist);
+    updateArtwork(raw.trim(), "");
 
-  } catch (e) {
+  } catch {
     applyFallbackMetadata();
   }
 }
@@ -512,7 +479,7 @@ if (metaURL) {
 }
 
 async function updateArtwork(title, artist) {
-  const query = encodeURIComponent(`${title || ""} ${artist || ""}`.trim());
+  const query = encodeURIComponent(title.trim());
 
   if (!query) {
     showFallback();
@@ -541,7 +508,7 @@ async function updateArtwork(title, artist) {
     } else {
       showFallback();
     }
-  } catch (e) {
+  } catch {
     showFallback();
   }
 }
