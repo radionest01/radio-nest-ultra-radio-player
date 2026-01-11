@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
   <meta charset="UTF-8" />
   <title>Radio Nest Player</title>
@@ -5,51 +7,57 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Full-page transparent base */
+    :root {
+      --text: #fff;
+      --subtext: rgba(255,255,255,0.7);
+      --glass: rgba(0,0,0,0.25);
+    }
+
+    .theme-light {
+      --text: #000;
+      --subtext: rgba(0,0,0,0.7);
+      --glass: rgba(255,255,255,0.08);
+    }
+
+    .theme-dark {
+      --text: #fff;
+      --subtext: rgba(255,255,255,0.7);
+      --glass: rgba(0,0,0,0.25);
+    }
+
     body {
       margin: 0;
       padding: 0;
       font-family: "Montserrat", system-ui, sans-serif;
       background: transparent;
-      overflow-x: hidden;
+      overflow: hidden;
+      height: 100vh;
+      color: var(--text);
     }
 
-    /* Full-page glass blur layer */
     .glass-bg {
       position: fixed;
       inset: 0;
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(30px);
+      background: var(--glass);
       z-index: 1;
       pointer-events: none;
-      transition: background 0.3s ease;
     }
 
-    /* Light mode glass */
-    .theme-light .glass-bg {
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    /* Dark mode glass */
-    .theme-dark .glass-bg {
-      background: rgba(0, 0, 0, 0.25);
-    }
-
-    /* Player wrapper sits above the blur */
     .page-wrap {
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 40px 50px;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 100vh;
+      padding: 40px 50px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
-    /* Masthead */
     .masthead {
       margin-bottom: 20px;
     }
@@ -62,32 +70,31 @@
       background: none;
       border: none;
       padding: 0;
+      color: var(--text);
     }
-
-    .theme-light .masthead-title { color: #2f80ed; }
-    .theme-dark .masthead-title { color: #8ab4ff; }
 
     .masthead-sub {
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      opacity: 0.7;
+      color: var(--subtext);
     }
 
-    /* Player layout */
     .player-layout {
       display: flex;
-      flex-wrap: wrap;
       gap: 40px;
       align-items: center;
+      flex-wrap: nowrap;
+      overflow: hidden;
     }
 
-    /* Album art */
     .art-wrap {
       flex: 0 0 400px;
       aspect-ratio: 1/1;
       overflow: hidden;
-      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+      box-shadow: 0 22px 40px rgba(0,0,0,0.5);
+      flex-shrink: 0;
     }
 
     .art-img {
@@ -105,24 +112,21 @@
       font-size: 10px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      opacity: 0.7;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      display: none;
     }
 
     .theme-light .fallback-chip {
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255,255,255,0.5);
       color: #000;
     }
 
-    .theme-dark .fallback-chip {
-      background: rgba(0, 0, 0, 0.5);
-      color: #fff;
-    }
-
-    /* Metadata */
     .meta-wrap {
       flex: 1;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .onair-label {
@@ -130,34 +134,44 @@
       text-transform: uppercase;
       letter-spacing: 0.22em;
       margin-bottom: 8px;
-      opacity: 0.7;
+      color: var(--subtext);
     }
 
-    .theme-light .onair-label span { color: #ff9c35; }
-    .theme-dark .onair-label span { color: #ffb866; }
+    .onair-label span {
+      color: #ff9c35;
+    }
 
     .track-title {
       font-size: clamp(28px, 4vw, 36px);
       font-weight: 700;
       text-transform: uppercase;
       margin-bottom: 4px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .track-artist {
       font-size: clamp(14px, 2vw, 16px);
       text-transform: uppercase;
       letter-spacing: 0.22em;
-      opacity: 0.8;
       margin-bottom: 10px;
+      color: var(--subtext);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .track-sub {
       font-size: 14px;
-      opacity: 0.7;
+      color: var(--subtext);
       margin-bottom: 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* Controls */
     .controls-block {
       display: flex;
       flex-direction: column;
@@ -172,20 +186,14 @@
       font-weight: 700;
       border: none;
       cursor: pointer;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
-    }
-
-    .theme-light .play-btn {
       background: #fff;
       color: #000;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.4);
     }
 
-    .theme-dark .play-btn {
-      background: #fff;
-      color: #000;
+    .volume-wrap {
+      width: 200px;
     }
-
-    .volume-wrap { width: 200px; }
 
     .volume-bar {
       width: 100%;
@@ -194,10 +202,8 @@
       cursor: pointer;
       -webkit-appearance: none;
       appearance: none;
+      background: var(--subtext);
     }
-
-    .theme-light .volume-bar { background: rgba(0, 0, 0, 0.3); }
-    .theme-dark .volume-bar { background: rgba(255, 255, 255, 0.3); }
 
     .volume-bar::-webkit-slider-thumb {
       width: 14px;
@@ -209,32 +215,26 @@
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Full‑page glass blur layer -->
   <div class="glass-bg"></div>
 
-  <!-- Player content wrapper -->
   <div class="page-wrap">
 
-    <!-- Masthead -->
     <div class="masthead">
       <button class="masthead-title" onclick="location.reload()">RADIO NEST PLAYER</button>
       <div class="masthead-sub">UNIVERSAL EMBEDDED LISTENING EXPERIENCE</div>
     </div>
 
-    <!-- Player layout -->
     <div class="player-layout">
 
-      <!-- Album Art -->
       <div class="art-wrap">
-        <img id="artwork" class="art-img" src="" alt="Album Art">
-        <div id="fallbackChip" class="fallback-chip" style="display:none;">NO ARTWORK</div>
+        <img id="artwork" class="art-img" src="" alt="">
+        <div id="fallbackChip" class="fallback-chip">NO ARTWORK</div>
       </div>
 
-      <!-- Metadata + Controls -->
       <div class="meta-wrap">
-
         <div class="onair-label"><span>●</span> NOW PLAYING</div>
 
         <div id="trackTitle" class="track-title">Loading…</div>
@@ -243,59 +243,45 @@
 
         <div class="controls-block">
           <button id="playButton" class="play-btn">PLAY</button>
-
           <div class="volume-wrap">
             <input id="volumeBar" class="volume-bar" type="range" min="0" max="100" value="80">
           </div>
         </div>
-
       </div>
+
     </div>
   </div>
 
-</body>
 <script>
-/* -----------------------------------------------------------
-   AUTO LIGHT / DARK THEME DETECTION
------------------------------------------------------------ */
-function detectTheme() {
-  try {
-    const bg = window.getComputedStyle(window.parent.document.body).backgroundColor;
+/* -------------------------------
+   THEME HANDLING (URL + postMessage)
+-------------------------------- */
+function applyTheme(theme) {
+  document.body.classList.remove("theme-light", "theme-dark");
 
-    // Extract RGB
-    const match = bg.match(/rgba?\((\d+), (\d+), (\d+)(?:, [\d.]+)?\)/);
-    if (!match) return;
-
-    const r = parseInt(match[1]);
-    const g = parseInt(match[2]);
-    const b = parseInt(match[3]);
-
-    // Relative luminance
-    const luminance = 0.2126*r + 0.7152*g + 0.0722*b;
-
-    if (luminance > 140) {
-      document.body.classList.add("theme-light");
-      document.body.classList.remove("theme-dark");
-    } else {
-      document.body.classList.add("theme-dark");
-      document.body.classList.remove("theme-light");
-    }
-  } catch (e) {
-    // Default to dark if cross‑domain or unreadable
+  if (theme === "light") {
+    document.body.classList.add("theme-light");
+  } else if (theme === "dark") {
+    document.body.classList.add("theme-dark");
+  } else {
     document.body.classList.add("theme-dark");
   }
 }
 
-detectTheme();
-setInterval(detectTheme, 2000);
+const params = new URLSearchParams(window.location.search);
+applyTheme(params.get("theme"));
 
+window.addEventListener("message", (event) => {
+  if (event.data?.theme) {
+    applyTheme(event.data.theme);
+  }
+});
 
-/* -----------------------------------------------------------
-   STREAM + METADATA SETUP
------------------------------------------------------------ */
-const urlParams = new URLSearchParams(window.location.search);
-const streamURL = urlParams.get("stream");
-const metaURL = urlParams.get("meta");
+/* -------------------------------
+   STREAM + METADATA
+-------------------------------- */
+const streamURL = params.get("stream");
+const metaURL = params.get("meta");
 
 const audio = new Audio();
 audio.src = streamURL;
@@ -312,10 +298,6 @@ const subEl = document.getElementById("trackSub");
 const artworkEl = document.getElementById("artwork");
 const fallbackChip = document.getElementById("fallbackChip");
 
-
-/* -----------------------------------------------------------
-   PLAY / PAUSE
------------------------------------------------------------ */
 playButton.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -326,18 +308,10 @@ playButton.addEventListener("click", () => {
   }
 });
 
-
-/* -----------------------------------------------------------
-   VOLUME
------------------------------------------------------------ */
 volumeBar.addEventListener("input", () => {
   audio.volume = volumeBar.value / 100;
 });
 
-
-/* -----------------------------------------------------------
-   METADATA FETCHING
------------------------------------------------------------ */
 async function fetchMetadata() {
   try {
     const res = await fetch(metaURL + "?_=" + Date.now());
@@ -352,7 +326,7 @@ async function fetchMetadata() {
     subEl.textContent = album;
 
     updateArtwork(title, artist);
-  } catch (e) {
+  } catch {
     titleEl.textContent = "Unable to load metadata";
   }
 }
@@ -360,10 +334,9 @@ async function fetchMetadata() {
 setInterval(fetchMetadata, 5000);
 fetchMetadata();
 
-
-/* -----------------------------------------------------------
-   ARTWORK FETCHING + UPSCALE
------------------------------------------------------------ */
+/* -------------------------------
+   ARTWORK
+-------------------------------- */
 async function updateArtwork(title, artist) {
   const query = encodeURIComponent(`${title} ${artist}`);
 
@@ -373,10 +346,8 @@ async function updateArtwork(title, artist) {
     );
     const data = await res.json();
 
-    if (data.results && data.results.length > 0) {
+    if (data.results?.length > 0) {
       let art = data.results[0].artworkUrl100;
-
-      // Upscale to 1200x1200
       art = art.replace("100x100bb.jpg", "1200x1200bb.jpg");
 
       artworkEl.src = art;
@@ -384,7 +355,7 @@ async function updateArtwork(title, artist) {
     } else {
       showFallback();
     }
-  } catch (e) {
+  } catch {
     showFallback();
   }
 }
@@ -394,9 +365,9 @@ function showFallback() {
   fallbackChip.style.display = "block";
 }
 
-
-/* -----------------------------------------------------------
-   INITIAL VOLUME
------------------------------------------------------------ */
 audio.volume = 1.0;
 </script>
+
+</body>
+</html>
+
