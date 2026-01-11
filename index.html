@@ -25,7 +25,7 @@
       --text: #fff;
       --subtext: rgba(255,255,255,0.7);
       --glass: rgba(255,255,255,0.06);
-      --title-color: #0d4f8b; /* deeper, calmer blue */
+      --title-color: #0d4f8b;
     }
 
     body {
@@ -135,12 +135,14 @@
       overflow: hidden;
     }
 
+    /* NOW PLAYING — bigger + more noticeable */
     .onair-label {
-      font-size: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      margin-bottom: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.22em;
-      margin-bottom: 8px;
-      color: var(--subtext);
+      color: var(--title-color);
     }
 
     .onair-label span {
@@ -332,10 +334,11 @@ function showFallback() {
   fallbackChip.style.display = "none";
 }
 
+/* STOP instead of PAUSE */
 playButton.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
-    playButton.textContent = "PAUSE";
+    playButton.textContent = "STOP";
   } else {
     audio.pause();
     playButton.textContent = "PLAY";
