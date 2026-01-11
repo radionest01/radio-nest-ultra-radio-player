@@ -12,6 +12,9 @@
       --subtext: rgba(255,255,255,0.7);
       --glass: rgba(0,0,0,0.25);
       --title-color: #fff;
+      --slider-track: linear-gradient(90deg, #ffffff 0%, #d0d0d0 100%);
+      --slider-thumb: #ffffff;
+      --slider-thumb-glow: rgba(255,255,255,0.6);
     }
 
     .theme-dark {
@@ -19,6 +22,9 @@
       --subtext: rgba(0,0,0,0.7);
       --glass: rgba(0,0,0,0.18);
       --title-color: #004a99;
+      --slider-track: linear-gradient(90deg, #333 0%, #777 100%);
+      --slider-thumb: #000;
+      --slider-thumb-glow: rgba(0,0,0,0.4);
     }
 
     .theme-light {
@@ -48,6 +54,13 @@
       pointer-events: none;
       border-radius: 12px;
       overflow: hidden;
+    }
+
+    /* Fallback if backdrop-filter not supported */
+    @supports not ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+      .glass-bg {
+        background: rgba(0, 0, 0, 0.6);
+      }
     }
 
     /* DESKTOP CONTAINER */
@@ -100,11 +113,21 @@
 
     .art-wrap {
       flex: 0 0 400px;
-      aspect-ratio: 1/1;
-      overflow: hidden;
       position: relative;
       box-shadow: 0 22px 40px rgba(0,0,0,0.5);
       border-radius: 12px;
+      overflow: hidden;
+      /* aspect-ratio fallback */
+      width: 400px;
+      height: 400px;
+    }
+
+    @supports (aspect-ratio: 1 / 1) {
+      .art-wrap {
+        width: auto;
+        height: auto;
+        aspect-ratio: 1 / 1;
+      }
     }
 
     .art-img {
@@ -113,6 +136,7 @@
       object-fit: cover;
       border-radius: 12px;
       opacity: 1;
+      -webkit-transition: opacity 0.4s ease;
       transition: opacity 0.4s ease;
     }
 
@@ -165,20 +189,20 @@
       word-break: break-word;
     }
 
-    .track-title {
-      font-size: clamp(28px, 4vw, 36px);
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      color: var(--text);
-    }
-
     .track-artist {
       font-size: clamp(14px, 2vw, 16px);
       text-transform: uppercase;
       letter-spacing: 0.22em;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       color: var(--subtext);
+    }
+
+    .track-title {
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: var(--text);
     }
 
     .track-sub {
@@ -201,22 +225,86 @@
       margin-bottom: 15px;
     }
 
+    /* STYLISH & CROSS-BROWSER VOLUME SLIDER */
     .volume-wrap {
-      width: 200px;
+      width: 220px;
     }
 
     .volume-bar {
       width: 100%;
-      height: 4px;
+      height: 6px;
       border-radius: 999px;
       cursor: pointer;
+      background: var(--slider-track);
+      outline: none;
       -webkit-appearance: none;
       appearance: none;
-      background: var(--subtext);
+    }
+
+    /* WebKit track */
+    .volume-bar::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--slider-track);
+    }
+
+    /* WebKit thumb */
+    .volume-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      box-shadow: 0 0 10px var(--slider-thumb-glow);
+      -webkit-box-shadow: 0 0 10px var(--slider-thumb-glow);
+      border: none;
+      margin-top: -6px; /* centers thumb on track */
+      -webkit-transition: -webkit-transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .volume-bar::-webkit-slider-thumb:hover {
+      -webkit-transform: scale(1.15);
+      transform: scale(1.15);
+      box-shadow: 0 0 14px var(--slider-thumb-glow);
+      -webkit-box-shadow: 0 0 14px var(--slider-thumb-glow);
+    }
+
+    /* Firefox track */
+    .volume-bar::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--slider-track);
+    }
+
+    /* Firefox thumb */
+    .volume-bar::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      box-shadow: 0 0 10px var(--slider-thumb-glow);
+      border: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .volume-bar::-moz-range-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 14px var(--slider-thumb-glow);
+    }
+
+    /* Remove Firefox inner border */
+    .volume-bar::-moz-focus-outer {
+      border: 0;
     }
 
     /* MOBILE + TABLET */
     @media (max-width: 1024px) {
+
+      .page-wrap {
+        padding: 20px;
+      }
 
       .masthead {
         text-align: center;
@@ -241,15 +329,22 @@
         align-items: center;
         width: 100%;
         max-width: 500px;
+        display: flex;
+        flex-direction: column;
       }
+
+      /* MOBILE ORDERING */
+      .onair-label { order: 1; }
+      .track-artist { order: 2; }
+      .track-title { order: 3; }
+      .track-sub   { order: 4; }
+      .play-btn    { order: 5; }
+      .art-wrap    { order: 6; }
 
       .art-wrap {
         width: 100%;
         max-width: 350px;
-      }
-
-      .play-btn {
-        margin: 0 auto;
+        height: auto;
       }
 
       .volume-wrap {
@@ -266,7 +361,9 @@
   <div class="page-wrap">
 
     <div class="masthead">
-      <button class="masthead-title" onclick="window.open('https://myradionest.com', '_blank')">RADIO NEST ULTRA PLAYER</button>
+      <button class="masthead-title" onclick="window.open('https://myradionest.com', '_blank')">
+        RADIO NEST ULTRA PLAYER
+      </button>
       <div class="masthead-sub">Everything Radio — All in One Nest.</div>
     </div>
 
@@ -280,8 +377,8 @@
       <div class="meta-wrap">
         <div class="onair-label"><span>●</span> NOW PLAYING</div>
 
-        <div id="trackTitle" class="track-title">Loading…</div>
         <div id="trackArtist" class="track-artist"></div>
+        <div id="trackTitle" class="track-title">Loading…</div>
         <div id="trackSub" class="track-sub"></div>
 
         <button id="playButton" class="play-btn">PLAY</button>
@@ -337,8 +434,8 @@ const FALLBACK_ART =
   "https://i.ibb.co/sd348dNG/Online-Radio-Album-Art-Fall-Back-1.png";
 
 function applyFallbackMetadata() {
-  titleEl.textContent = "Radio - Live Stream";
-  artistEl.textContent = "";
+  titleEl.textContent = "Live Stream";
+  artistEl.textContent = "Radio";
   subEl.textContent = "";
   showFallback();
 }
@@ -364,11 +461,14 @@ playButton.addEventListener("click", () => {
   }
 });
 
-volumeBar?.addEventListener("input", () => {
+if (volumeBar) {
   audio.volume = volumeBar.value / 100;
-});
-
-audio.volume = 1.0;
+  volumeBar.addEventListener("input", () => {
+    audio.volume = volumeBar.value / 100;
+  });
+} else {
+  audio.volume = 1.0;
+}
 
 async function fetchMetadata() {
   if (!metaURL) {
@@ -393,13 +493,13 @@ async function fetchMetadata() {
       return;
     }
 
-    titleEl.textContent = title || "Radio - Live Stream";
-    artistEl.textContent = artist || "";
+    artistEl.textContent = artist || "Unknown Artist";
+    titleEl.textContent = title || "Unknown Title";
     subEl.textContent = album || "";
 
     updateArtwork(title, artist);
 
-  } catch {
+  } catch (e) {
     applyFallbackMetadata();
   }
 }
@@ -441,7 +541,7 @@ async function updateArtwork(title, artist) {
     } else {
       showFallback();
     }
-  } catch {
+  } catch (e) {
     showFallback();
   }
 }
