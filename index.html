@@ -13,7 +13,6 @@
       --text-main: #ffffff;
       --text-sub: #dcd6e5;
       --text-muted: #a59fb2;
-      --error: #ff4b5c;
     }
 
     * {
@@ -30,8 +29,7 @@
         radial-gradient(circle at 10% 0%, rgba(255, 190, 130, 0.35), transparent 60%),
         radial-gradient(circle at 90% 100%, rgba(178, 120, 255, 0.35), transparent 55%),
         #08050b;
-      display: block;
-      padding: 60px 70px;
+      padding: 40px 50px;
     }
 
     .page-wrap {
@@ -67,15 +65,14 @@
     }
 
     .player-layout {
-      display: grid;
-      grid-template-columns: 400px minmax(0, 1fr);
-      column-gap: 32px;
-      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: flex-start;
     }
 
     .art-wrap {
-      position: relative;
-      width: 100%;
+      flex: 0 0 400px;
       aspect-ratio: 1 / 1;
       background: #000;
       box-shadow: 0 22px 40px rgba(0, 0, 0, 0.85);
@@ -104,6 +101,7 @@
     }
 
     .meta-wrap {
+      flex: 1;
       display: flex;
       flex-direction: column;
     }
@@ -122,17 +120,16 @@
     }
 
     .track-title {
-      font-size: 32px;
+      font-size: clamp(28px, 4vw, 36px);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: var(--text-main);
       margin-bottom: 4px;
       min-height: 1.2em;
     }
 
     .track-artist {
-      font-size: 15px;
+      font-size: clamp(14px, 2vw, 16px);
       text-transform: uppercase;
       letter-spacing: 0.22em;
       color: var(--text-sub);
@@ -150,8 +147,8 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 18px;
-      margin-bottom: 28px;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .play-btn {
@@ -196,7 +193,6 @@
 
 <body>
   <div class="page-wrap">
-
     <div class="masthead">
       <button class="masthead-title" onclick="window.open('https://myradionest.com', '_blank')">
         RADIO NEST PLAYER
@@ -228,43 +224,121 @@
       </div>
     </main>
 
-  </div>
+    <audio id="audioEl"></audio>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const streamUrl = params.get("stream") || "";
+        const metaUrl = params.get("meta") || "";
 
-  <audio id="audioEl"></audio>
+        const audio = document.getElementById("audioEl");
+        const playBtn = document.getElementById("playBtn");
+        const volumeSlider = document.getElementById("volumeSlider");
+        const albumArt = document.getElementById("albumArt");
+        const fallbackChip = document.getElementById("fallbackChip");
+        const trackTitleEl = document.getElementById("trackTitle");
+        const trackArtistEl = document.getElementById("trackArtist");
+        const trackSubEl = document.getElementById("trackSub");
 
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const streamUrl = params.get("stream") || "";
-      const metaUrl = params.get("meta") || "";
+        const FALLBACK_ART =
+          "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+        const FALLBACK_TEXT = "Radio - Live Stream";
 
-      const audio = document.getElementById("audioEl");
-      const playBtn = document.getElementById("playBtn");
-      const volumeSlider = document.getElementById("volumeSlider");
-      const albumArt = document.getElementById("albumArt");
-      const fallbackChip = document.getElementById("fallbackChip");
-      const trackTitleEl = document.getElementById("trackTitle");
-      const trackArtistEl = document.getElementById("trackArtist");
-      const trackSubEl = document.getElementById("trackSub");
+        if (streamUrl) audio.src = streamUrl;
+        audio.volume = 1.0;
 
-      const FALLBACK_ART =
-        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-      const FALLBACK_TEXT = "Radio - Live Stream";
+        playBtn.addEventListener("click", () => {
+          if (!audio.src) return;
 
-      if (streamUrl) audio.src = streamUrl;
-      audio.volume = 1.0;
+          if (audio.paused) {
+            audio.play().then(() => {
+              playBtn.textContent = "Stop";
+            }).catch(() => {});
+          } else {
+            audio.pause();
+            playBtn.textContent = "Play";
+          }
+        });
 
-      playBtn.addEventListener("click", () => {
-        if (!audio.src) return;
+        volumeSlider.addEventListener("input", () => {
+          audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
+        });
 
-        if (audio.paused) {
-          audio.play().then(() => {
-            playBtn.textContent = "Stop";
-          }).catch(() => {});
-        } else {
-          audio.pause();
-          playBtn.textContent = "Play";
+        async function fetchMetadata() {
+          if (!metaUrl) {
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+            return;
+          }
+
+          try {
+            const res = await fetch(metaUrl, { cache: "no-store" });
+            const data = await res.json();
+
+            const artist = (data.artist || "").trim();
+            const title = (data.title || "").trim();
+
+            if (!artist && !title) {
+              trackTitleEl.textContent = "Loading...";
+              trackArtistEl.textContent = "";
+              trackSubEl.textContent = FALLBACK_TEXT;
+              albumArt.src = FALLBACK_ART;
+              fallbackChip.style.display = "inline-flex";
+              return;
+            }
+
+            trackTitleEl.textContent = title || FALLBACK_TEXT;
+            trackArtistEl.textContent = artist || "";
+            trackSubEl.textContent = FALLBACK_TEXT;
+
+            await updateArtwork(artist, title);
+          } catch {
+            trackTitleEl.textContent = FALLBACK_TEXT;
+            trackArtistEl.textContent = "";
+            trackSubEl.textContent = FALLBACK_TEXT;
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+          }
         }
-      });
 
-      volumeSlider.addEventListener("
+        async function updateArtwork(artist, title) {
+          const q = `${artist} ${title}`.trim();
+          if (!q) {
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+            return;
+          }
+
+          try {
+            const res = await fetch(
+              `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
+            );
+            const json = await res.json();
+
+            if (!json.results.length) {
+              albumArt.src = FALLBACK_ART;
+              fallbackChip.style.display = "inline-flex";
+              return;
+            }
+
+            const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
+            albumArt.src = art;
+            fallbackChip.style.display = "none";
+          } catch {
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+          }
+        }
+
+        if (metaUrl) {
+          fetchMetadata();
+          setInterval(fetchMetadata, 15000);
+        } else {
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+        }
+      })();
+    </script>
+
+  </body>
+</html>
