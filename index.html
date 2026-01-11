@@ -11,20 +11,23 @@
       --text: #fff;
       --subtext: rgba(255,255,255,0.7);
       --glass: rgba(0,0,0,0.25);
+      --title-color: #fff;
     }
 
-    /* DARK = BLACK TEXT */
+    /* DARK = BLACK TEXT + DARK BLUE TITLE */
     .theme-dark {
       --text: #000;
       --subtext: rgba(0,0,0,0.7);
       --glass: rgba(0,0,0,0.25);
+      --title-color: #004a99;
     }
 
-    /* LIGHT = WHITE TEXT */
+    /* LIGHT = WHITE TEXT + LIGHT BLUE TITLE */
     .theme-light {
       --text: #fff;
       --subtext: rgba(255,255,255,0.7);
       --glass: rgba(255,255,255,0.08);
+      --title-color: #6ec6ff;
     }
 
     body {
@@ -55,7 +58,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      padding: 40px 50px;
+      padding: 10px 50px 40px 50px;
       box-sizing: border-box;
       overflow: hidden;
     }
@@ -72,7 +75,7 @@
       background: none;
       border: none;
       padding: 0;
-      color: var(--text);
+      color: var(--title-color);
     }
 
     .masthead-sub {
@@ -256,16 +259,10 @@
   </div>
 
 <script>
-/* -------------------------------
-   URL PARAMS
--------------------------------- */
 const params = new URLSearchParams(window.location.search);
 const streamURL = params.get("stream");
 const metaURL = params.get("meta");
 
-/* -------------------------------
-   THEME HANDLING
--------------------------------- */
 function applyTheme(theme) {
   document.body.classList.remove("theme-light", "theme-dark");
   const t = (theme || "").toLowerCase();
@@ -285,9 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/* -------------------------------
-   AUDIO + ELEMENTS
--------------------------------- */
 const audio = new Audio();
 audio.src = streamURL;
 audio.preload = "none";
@@ -303,9 +297,6 @@ const subEl = document.getElementById("trackSub");
 const artworkEl = document.getElementById("artwork");
 const fallbackChip = document.getElementById("fallbackChip");
 
-/* -------------------------------
-   FALLBACK METADATA + ARTWORK
--------------------------------- */
 const FALLBACK_ART =
   "https://i.ibb.co/sd348dNG/Online-Radio-Album-Art-Fall-Back-1.png";
 
@@ -313,7 +304,6 @@ function applyFallbackMetadata() {
   titleEl.textContent = "Radio - Live Stream";
   artistEl.textContent = "";
   subEl.textContent = "";
-
   artworkEl.src = FALLBACK_ART;
   fallbackChip.style.display = "none";
 }
@@ -323,9 +313,6 @@ function showFallback() {
   fallbackChip.style.display = "none";
 }
 
-/* -------------------------------
-   PLAY / PAUSE
--------------------------------- */
 playButton.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -342,9 +329,6 @@ volumeBar.addEventListener("input", () => {
 
 audio.volume = 0.8;
 
-/* -------------------------------
-   METADATA FETCH
--------------------------------- */
 async function fetchMetadata() {
   if (!metaURL) {
     applyFallbackMetadata();
@@ -386,9 +370,6 @@ if (metaURL) {
   applyFallbackMetadata();
 }
 
-/* -------------------------------
-   ARTWORK FETCH + FALLBACK
--------------------------------- */
 async function updateArtwork(title, artist) {
   const query = encodeURIComponent(`${title || ""} ${artist || ""}`.trim());
 
