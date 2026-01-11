@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <title>Radio Nest Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --bg-main: #120f14;
@@ -148,7 +146,6 @@
       margin-bottom: 18px;
     }
 
-    /* NEW CONTROLS */
     .controls-block {
       display: flex;
       flex-direction: column;
@@ -194,22 +191,9 @@
       background: #ffffff;
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
     }
-
-    .footer-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      gap: 12px;
-    }
-
-    .meta-status.error {
-      color: var(--error);
-    }
   </style>
 </head>
+
 <body>
   <div class="page-wrap">
 
@@ -241,140 +225,131 @@
             <input id="volumeSlider" type="range" min="0" max="100" value="100" class="volume-bar">
           </div>
         </div>
-
-        <div class="footer-row">
-          <span>Artwork via iTunes Search API</span>
-          <span id="metaStatus" class="meta-status">Updating every 15s</span>
-        </div>
       </div>
     </main>
 
   </div>
 
   <audio id="audioEl"></audio>
-<script>
-  (function () {
-    const params = new URLSearchParams(window.location.search);
-    const streamUrl = params.get("stream") || "";
-    const metaUrl = params.get("meta") || "";
 
-    const audio = document.getElementById("audioEl");
-    const playBtn = document.getElementById("playBtn");
-    const volumeSlider = document.getElementById("volumeSlider");
-    const albumArt = document.getElementById("albumArt");
-    const fallbackChip = document.getElementById("fallbackChip");
-    const trackTitleEl = document.getElementById("trackTitle");
-    const trackArtistEl = document.getElementById("trackArtist");
-    const trackSubEl = document.getElementById("trackSub");
-    const metaStatusEl = document.getElementById("metaStatus");
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const streamUrl = params.get("stream") || "";
+      const metaUrl = params.get("meta") || "";
 
-    const FALLBACK_ART =
-      "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-    const FALLBACK_TEXT = "Radio - Live Stream";
+      const audio = document.getElementById("audioEl");
+      const playBtn = document.getElementById("playBtn");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const albumArt = document.getElementById("albumArt");
+      const fallbackChip = document.getElementById("fallbackChip");
+      const trackTitleEl = document.getElementById("trackTitle");
+      const trackArtistEl = document.getElementById("trackArtist");
+      const trackSubEl = document.getElementById("trackSub");
 
-    if (streamUrl) audio.src = streamUrl;
-    audio.volume = 1.0;
+      const FALLBACK_ART =
+        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+      const FALLBACK_TEXT = "Radio - Live Stream";
 
-    playBtn.addEventListener("click", () => {
-      if (!audio.src) return;
+      if (streamUrl) audio.src = streamUrl;
+      audio.volume = 1.0;
 
-      if (audio.paused) {
-        audio.play().then(() => {
-          playBtn.textContent = "Stop";
-        });
-      } else {
-        audio.pause();
-        playBtn.textContent = "Play";
-      }
-    });
+      playBtn.addEventListener("click", () => {
+        if (!audio.src) return;
 
-    volumeSlider.addEventListener("input", () => {
-      audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
-    });
+        if (audio.paused) {
+          audio.play().then(() => {
+            playBtn.textContent = "Stop";
+          }).catch(() => {
+            // ignore play errors (autoplay policies etc.)
+          });
+        } else {
+          audio.pause();
+          playBtn.textContent = "Play";
+        }
+      });
 
-    async function fetchMetadata() {
-      if (!metaUrl) {
-        metaStatusEl.textContent = "No metadata source configured";
-        metaStatusEl.classList.add("error");
-        albumArt.src = FALLBACK_ART;
-        fallbackChip.style.display = "inline-flex";
-        return;
-      }
+      volumeSlider.addEventListener("input", () => {
+        audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
+      });
 
-      metaStatusEl.textContent = "Updating...";
-      metaStatusEl.classList.remove("error");
+      async function fetchMetadata() {
+        if (!metaUrl) {
+          // No metadata configured: keep fallback art/text, no status message
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+          return;
+        }
 
-      try {
-        const res = await fetch(metaUrl, { cache: "no-store" });
-        const data = await res.json();
+        try {
+          const res = await fetch(metaUrl, { cache: "no-store" });
+          const data = await res.json();
 
-        const artist = (data.artist || "").trim();
-        const title = (data.title || "").trim();
+          const artist = (data.artist || "").trim();
+          const title = (data.title || "").trim();
 
-        if (!artist && !title) {
-          trackTitleEl.textContent = "Loading...";
+          if (!artist && !title) {
+            trackTitleEl.textContent = "Loading...";
+            trackArtistEl.textContent = "";
+            trackSubEl.textContent = FALLBACK_TEXT;
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+            return;
+          }
+
+          trackTitleEl.textContent = title || FALLBACK_TEXT;
+          trackArtistEl.textContent = artist || "";
+          trackSubEl.textContent = FALLBACK_TEXT;
+
+          await updateArtwork(artist, title);
+        } catch {
+          // On metadata error, just fall back to generic art/text quietly
+          trackTitleEl.textContent = FALLBACK_TEXT;
           trackArtistEl.textContent = "";
           trackSubEl.textContent = FALLBACK_TEXT;
           albumArt.src = FALLBACK_ART;
           fallbackChip.style.display = "inline-flex";
-          metaStatusEl.textContent = "No metadata";
-          return;
         }
-
-        trackTitleEl.textContent = title || FALLBACK_TEXT;
-        trackArtistEl.textContent = artist || "";
-        trackSubEl.textContent = FALLBACK_TEXT;
-
-        await updateArtwork(artist, title);
-        metaStatusEl.textContent = "Updated just now";
-
-      } catch {
-        metaStatusEl.textContent = "Metadata error";
-        metaStatusEl.classList.add("error");
-        albumArt.src = FALLBACK_ART;
-        fallbackChip.style.display = "inline-flex";
-      }
-    }
-
-    async function updateArtwork(artist, title) {
-      const q = `${artist} ${title}`.trim();
-      if (!q) {
-        albumArt.src = FALLBACK_ART;
-        fallbackChip.style.display = "inline-flex";
-        return;
       }
 
-      try {
-        const res = await fetch(
-          `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
-        );
-        const json = await res.json();
-
-        if (!json.results.length) {
+      async function updateArtwork(artist, title) {
+        const q = `${artist} ${title}`.trim();
+        if (!q) {
           albumArt.src = FALLBACK_ART;
           fallbackChip.style.display = "inline-flex";
           return;
         }
 
-        const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
-        albumArt.src = art;
-        fallbackChip.style.display = "none";
+        try {
+          const res = await fetch(
+            `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
+          );
+          const json = await res.json();
 
-      } catch {
+          if (!json.results.length) {
+            albumArt.src = FALLBACK_ART;
+            fallbackChip.style.display = "inline-flex";
+            return;
+          }
+
+          const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
+          albumArt.src = art;
+          fallbackChip.style.display = "none";
+        } catch {
+          albumArt.src = FALLBACK_ART;
+          fallbackChip.style.display = "inline-flex";
+        }
+      }
+
+      if (metaUrl) {
+        fetchMetadata();
+        setInterval(fetchMetadata, 15000);
+      } else {
+        // If no metadata URL, just show fallback; no text needed
         albumArt.src = FALLBACK_ART;
         fallbackChip.style.display = "inline-flex";
       }
-    }
-
-    if (metaUrl) {
-      fetchMetadata();
-      setInterval(fetchMetadata, 15000);
-    } else {
-      metaStatusEl.textContent = "No metadata source configured";
-      metaStatusEl.classList.add("error");
-    }
-  })();
-</script>
-
+    })();
+  </script>
 </body>
 </html>
