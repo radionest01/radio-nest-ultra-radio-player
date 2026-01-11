@@ -364,10 +364,83 @@
   </div>
 
 <script>
+/* -------------------------
+   URL params and license config
+-------------------------- */
 const params = new URLSearchParams(window.location.search);
 const streamURL = params.get("stream");
 const metaURL = params.get("meta");
+const licenseKey = params.get("license");
 
+// GitHub-hosted license file
+const licenseURL = "https://raw.githubusercontent.com/radionest01/radio-nest-ultra-radio-player/main/licenses.json";
+
+/* -------------------------
+   License checking
+-------------------------- */
+async function checkLicense() {
+  try {
+    const res = await fetch(licenseURL + "?_=" + Date.now());
+    const data = await res.json();
+
+    if (!data.licenses || !Array.isArray(data.licenses)) {
+      return showInvalid("License Data Error");
+    }
+
+    const license = data.licenses.find(l => l.key === licenseKey);
+
+    if (!license) {
+      return showInvalid("Invalid License");
+    }
+
+    if (license.expires === "never") {
+      return true;
+    }
+
+    const today = new Date();
+    const expiry = new Date(license.expires);
+
+    if (isNaN(expiry.getTime())) {
+      return showInvalid("Invalid Expiry Format");
+    }
+
+    if (today > expiry) {
+      return showInvalid("License Expired");
+    }
+
+    return true;
+
+  } catch (e) {
+    console.error("License check failed:", e);
+    return showInvalid("License Check Failed");
+  }
+}
+
+function showInvalid(message) {
+  document.body.innerHTML = `
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      font-family:Montserrat, sans-serif;
+      color:#fff;
+      background:#000;
+      text-align:center;
+      padding:20px;
+    ">
+      <div>
+        <h1 style="font-size:32px;margin-bottom:10px;">${message}</h1>
+        <p style="font-size:16px;opacity:0.7;">This Radio Nest Ultra Player is not licensed for this domain.</p>
+      </div>
+    </div>
+  `;
+  return false;
+}
+
+/* -------------------------
+   Theme handling
+-------------------------- */
 function applyTheme(theme) {
   document.body.classList.remove("theme-light", "theme-dark");
   const t = (theme || "").toLowerCase();
@@ -387,22 +460,61 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-const audio = new Audio();
-audio.src = streamURL;
-audio.preload = "none";
-audio.crossOrigin = "anonymous";
-
-const playButton = document.getElementById("playButton");
-const volumeBar = document.getElementById("volumeBar");
-
-const titleEl = document.getElementById("trackTitle");
-const subEl = document.getElementById("trackSub");
-
-const artworkEl = document.getElementById("artwork");
-const fallbackChip = document.getElementById("fallbackChip");
+/* -------------------------
+   Player + metadata logic
+-------------------------- */
+let audio;
+let playButton;
+let volumeBar;
+let titleEl;
+let subEl;
+let artworkEl;
+let fallbackChip;
 
 const FALLBACK_ART =
   "https://i.ibb.co/sd348dNG/Online-Radio-Album-Art-Fall-Back-1.png";
+
+function initPlayer() {
+  audio = new Audio();
+  audio.src = streamURL;
+  audio.preload = "none";
+  audio.crossOrigin = "anonymous";
+
+  playButton = document.getElementById("playButton");
+  volumeBar  = document.getElementById("volumeBar");
+  titleEl    = document.getElementById("trackTitle");
+  subEl      = document.getElementById("trackSub");
+  artworkEl  = document.getElementById("artwork");
+  fallbackChip = document.getElementById("fallbackChip");
+
+  if (!playButton || !titleEl || !subEl || !artworkEl) return;
+
+  playButton.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play();
+      playButton.textContent = "STOP";
+    } else {
+      audio.pause();
+      playButton.textContent = "PLAY";
+    }
+  });
+
+  if (volumeBar) {
+    audio.volume = volumeBar.value / 100;
+    volumeBar.addEventListener("input", () => {
+      audio.volume = volumeBar.value / 100;
+    });
+  } else {
+    audio.volume = 1.0;
+  }
+
+  if (metaURL) {
+    fetchMetadata();
+    setInterval(fetchMetadata, 5000);
+  } else {
+    applyFallbackMetadata();
+  }
+}
 
 function applyFallbackMetadata() {
   titleEl.textContent = "Live Stream";
@@ -419,25 +531,6 @@ function showFallback() {
     }, 200);
   }
   fallbackChip.style.display = "none";
-}
-
-playButton.addEventListener("click", () => {
-  if (audio.paused) {
-    audio.play();
-    playButton.textContent = "STOP";
-  } else {
-    audio.pause();
-    playButton.textContent = "PLAY";
-  }
-});
-
-if (volumeBar) {
-  audio.volume = volumeBar.value / 100;
-  volumeBar.addEventListener("input", () => {
-    audio.volume = volumeBar.value / 100;
-  });
-} else {
-  audio.volume = 1.0;
 }
 
 async function fetchMetadata() {
@@ -461,6 +554,7 @@ async function fetchMetadata() {
       return;
     }
 
+    // Entire metadata string shown as title
     titleEl.textContent = raw.trim();
     subEl.textContent = "";
 
@@ -469,13 +563,6 @@ async function fetchMetadata() {
   } catch {
     applyFallbackMetadata();
   }
-}
-
-if (metaURL) {
-  setInterval(fetchMetadata, 5000);
-  fetchMetadata();
-} else {
-  applyFallbackMetadata();
 }
 
 async function updateArtwork(title, artist) {
@@ -512,6 +599,15 @@ async function updateArtwork(title, artist) {
     showFallback();
   }
 }
+
+/* -------------------------
+   Boot sequence
+-------------------------- */
+checkLicense().then(valid => {
+  if (valid) {
+    initPlayer();
+  }
+});
 </script>
 
 </body>
