@@ -384,13 +384,13 @@ async function checkLicense() {
     const data = await res.json();
 
     if (!data.licenses || !Array.isArray(data.licenses)) {
-      return showInvalid("License Data Error");
+      return showInvalid("data");
     }
 
     const license = data.licenses.find(l => l.key === licenseKey);
 
     if (!license) {
-      return showInvalid("Invalid License");
+      return showInvalid("invalid");
     }
 
     if (license.expires === "never") {
@@ -401,22 +401,34 @@ async function checkLicense() {
     const expiry = new Date(license.expires);
 
     if (isNaN(expiry.getTime())) {
-      return showInvalid("Invalid Expiry Format");
+      return showInvalid("data");
     }
 
     if (today > expiry) {
-      return showInvalid("License Expired");
+      return showInvalid("expired");
     }
 
     return true;
 
   } catch (e) {
     console.error("License check failed:", e);
-    return showInvalid("License Check Failed");
+    return showInvalid("data");
   }
 }
 
-function showInvalid(message) {
+function showInvalid(reason) {
+  let title = "";
+  let message = "";
+
+  if (reason === "expired") {
+    title = "License Expired";
+    message = `The license for the Radio Nest Ultra Player has expired. Renew your licence at 
+      <a href="https://myradionest.com" target="_blank" style="color:#4da3ff;">myradionest.com</a>.`;
+  } else {
+    title = "Invalid License";
+    message = "This Radio Nest Ultra Player is not licensed.";
+  }
+
   document.body.innerHTML = `
     <div style="
       display:flex;
@@ -430,8 +442,8 @@ function showInvalid(message) {
       padding:20px;
     ">
       <div>
-        <h1 style="font-size:32px;margin-bottom:10px;">${message}</h1>
-        <p style="font-size:16px;opacity:0.7;">This Radio Nest Ultra Player is not licensed for this domain.</p>
+        <h1 style="font-size:32px;margin-bottom:10px;">${title}</h1>
+        <p style="font-size:16px;opacity:0.7;">${message}</p>
       </div>
     </div>
   `;
@@ -554,7 +566,6 @@ async function fetchMetadata() {
       return;
     }
 
-    // Entire metadata string shown as title
     titleEl.textContent = raw.trim();
     subEl.textContent = "";
 
