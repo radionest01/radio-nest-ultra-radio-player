@@ -439,14 +439,6 @@ async function updateMetadata() {
   }
 }
 
-/* Auto-height messaging */
-function sendHeight() {
-  const height = document.body.scrollHeight;
-  parent.postMessage({ playerHeight: height }, "*");
-}
-setInterval(sendHeight, 500);
-sendHeight();
-
 /* Start metadata polling */
 updateMetadata();
 setInterval(updateMetadata, 30000);
@@ -454,3 +446,4 @@ setInterval(updateMetadata, 30000);
 
 </body>
 </html>
+
