@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Radio Nest Player</title>
+  <title>Radio Nest Ultra Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -13,15 +13,17 @@
       --glass: rgba(0,0,0,0.25);
     }
 
+    /* LIGHT MODE = WHITE TEXT */
     .theme-light {
-      --text: #000;
-      --subtext: rgba(0,0,0,0.7);
+      --text: #fff;
+      --subtext: rgba(255,255,255,0.7);
       --glass: rgba(255,255,255,0.08);
     }
 
+    /* DARK MODE = BLACK TEXT */
     .theme-dark {
-      --text: #fff;
-      --subtext: rgba(255,255,255,0.7);
+      --text: #000;
+      --subtext: rgba(0,0,0,0.7);
       --glass: rgba(0,0,0,0.25);
     }
 
@@ -223,7 +225,7 @@
   <div class="page-wrap">
 
     <div class="masthead">
-      <button class="masthead-title" onclick="location.reload()">RADIO NEST PLAYER</button>
+      <button class="masthead-title" onclick="location.reload()">RADIO NEST ULTRA PLAYER</button>
       <div class="masthead-sub">UNIVERSAL EMBEDDED LISTENING EXPERIENCE</div>
     </div>
 
@@ -303,6 +305,21 @@ const subEl = document.getElementById("trackSub");
 const artworkEl = document.getElementById("artwork");
 const fallbackChip = document.getElementById("fallbackChip");
 
+/* -------------------------------
+   FALLBACK METADATA (Option A)
+-------------------------------- */
+function applyFallbackMetadata() {
+  titleEl.textContent = "Radio - Live Stream";
+  artistEl.textContent = "";
+  subEl.textContent = "";
+
+  artworkEl.src = "https://i.ibb.co/sd348dNG/Online-Radio-Album-Art-Fall-Back-1.png";
+  fallbackChip.style.display = "none";
+}
+
+/* -------------------------------
+   PLAY / PAUSE
+-------------------------------- */
 playButton.addEventListener("click", () => {
   if (audio.paused) {
     audio.play();
@@ -317,22 +334,31 @@ volumeBar.addEventListener("input", () => {
   audio.volume = volumeBar.value / 100;
 });
 
+/* -------------------------------
+   METADATA FETCH
+-------------------------------- */
 async function fetchMetadata() {
   try {
     const res = await fetch(metaURL + "?_=" + Date.now());
     const data = await res.json();
 
-    const title = data.icestats?.source?.title || "Unknown Title";
-    const artist = data.icestats?.source?.artist || "";
-    const album = data.icestats?.source?.album || "";
+    const title = data.icestats?.source?.title;
+    const artist = data.icestats?.source?.artist;
+    const album = data.icestats?.source?.album;
 
-    titleEl.textContent = title;
-    artistEl.textContent = artist;
-    subEl.textContent = album;
+    if (!title && !artist) {
+      applyFallbackMetadata();
+      return;
+    }
+
+    titleEl.textContent = title || "Radio - Live Stream";
+    artistEl.textContent = artist || "";
+    subEl.textContent = album || "";
 
     updateArtwork(title, artist);
+
   } catch {
-    titleEl.textContent = "Unable to load metadata";
+    applyFallbackMetadata();
   }
 }
 
@@ -340,7 +366,7 @@ setInterval(fetchMetadata, 5000);
 fetchMetadata();
 
 /* -------------------------------
-   ARTWORK
+   ARTWORK FETCH + FALLBACK
 -------------------------------- */
 async function updateArtwork(title, artist) {
   const query = encodeURIComponent(`${title} ${artist}`);
@@ -366,8 +392,8 @@ async function updateArtwork(title, artist) {
 }
 
 function showFallback() {
-  artworkEl.src = "";
-  fallbackChip.style.display = "block";
+  artworkEl.src = "https://i.ibb.co/sd348dNG/Online-Radio-Album-Art-Fall-Back-1.png";
+  fallbackChip.style.display = "none";
 }
 
 audio.volume = 0.8;
