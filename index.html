@@ -132,7 +132,6 @@
       object-fit: cover;
       border-radius: 12px;
       opacity: 1;
-      -webkit-transition: opacity 0.4s ease;
       transition: opacity 0.4s ease;
     }
 
@@ -218,80 +217,14 @@
       cursor: pointer;
       background: var(--slider-track);
       outline: none;
-      -webkit-appearance: none;
       appearance: none;
-    }
-
-    .volume-bar::-webkit-slider-runnable-track {
-      height: 6px;
-      border-radius: 999px;
-      background: var(--slider-track);
-    }
-
-    .volume-bar::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--slider-thumb);
-      box-shadow: 0 0 10px var(--slider-thumb-glow);
-      -webkit-box-shadow: 0 0 10px var(--slider-thumb-glow);
-      border: none;
-      margin-top: -6px;
-      -webkit-transition: -webkit-transform 0.2s ease, box-shadow 0.2s ease;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .volume-bar::-webkit-slider-thumb:hover {
-      -webkit-transform: scale(1.15);
-      transform: scale(1.15);
-      box-shadow: 0 0 14px var(--slider-thumb-glow);
-      -webkit-box-shadow: 0 0 14px var(--slider-thumb-glow);
-    }
-
-    .volume-bar::-moz-range-track {
-      height: 6px;
-      border-radius: 999px;
-      background: var(--slider-track);
-    }
-
-    .volume-bar::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--slider-thumb);
-      box-shadow: 0 0 10px var(--slider-thumb-glow);
-      border: none;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .volume-bar::-moz-range-thumb:hover {
-      transform: scale(1.15);
-      box-shadow: 0 0 14px var(--slider-thumb-glow);
-    }
-
-    .volume-bar::-moz-focus-outer {
-      border: 0;
     }
 
     @media (max-width: 1024px) {
-
-      .page-wrap {
-        padding: 20px;
-      }
-
-      .masthead {
-        text-align: center;
-      }
-
-      .masthead-title {
-        margin: 0 auto;
-      }
-
-      .masthead-sub {
-        text-align: center;
-      }
+      .page-wrap { padding: 20px; }
+      .masthead { text-align: center; }
+      .masthead-title { margin: 0 auto; }
+      .masthead-sub { text-align: center; }
 
       .player-layout {
         flex-direction: column;
@@ -304,8 +237,6 @@
         align-items: center;
         width: 100%;
         max-width: 500px;
-        display: flex;
-        flex-direction: column;
       }
 
       .onair-label { order: 1; }
@@ -320,9 +251,7 @@
         height: auto;
       }
 
-      .volume-wrap {
-        display: none;
-      }
+      .volume-wrap { display: none; }
     }
   </style>
 </head>
@@ -340,7 +269,7 @@
       <div class="masthead-sub">Everything Radio — All in One Nest.</div>
     </div>
 
-    <div class="player-layout">
+    <div id="playerArea" class="player-layout">
 
       <div class="art-wrap">
         <img id="artwork" class="art-img" src="" alt="">
@@ -364,20 +293,13 @@
   </div>
 
 <script>
-/* -------------------------
-   URL params and license config
--------------------------- */
 const params = new URLSearchParams(window.location.search);
 const streamURL = params.get("stream");
 const metaURL = params.get("meta");
 const licenseKey = params.get("license");
 
-// GitHub-hosted license file
 const licenseURL = "https://raw.githubusercontent.com/radionest01/radio-nest-ultra-radio-player/main/licenses.json";
 
-/* -------------------------
-   License checking
--------------------------- */
 async function checkLicense() {
   try {
     const res = await fetch(licenseURL + "?_=" + Date.now());
@@ -389,29 +311,17 @@ async function checkLicense() {
 
     const license = data.licenses.find(l => l.key === licenseKey);
 
-    if (!license) {
-      return showInvalid("invalid");
-    }
+    if (!license) return showInvalid("invalid");
 
-    if (license.expires === "never") {
-      return true;
-    }
-
-    const today = new Date();
-    const expiry = new Date(license.expires);
-
-    if (isNaN(expiry.getTime())) {
-      return showInvalid("data");
-    }
-
-    if (today > expiry) {
-      return showInvalid("expired");
+    if (license.expires !== "never") {
+      const today = new Date();
+      const expiry = new Date(license.expires);
+      if (today > expiry) return showInvalid("expired");
     }
 
     return true;
 
-  } catch (e) {
-    console.error("License check failed:", e);
+  } catch {
     return showInvalid("data");
   }
 }
@@ -429,52 +339,30 @@ function showInvalid(reason) {
     message = "This Radio Nest Ultra Player is not licensed.";
   }
 
-  document.body.innerHTML = `
-    <div style="
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      height:100vh;
-      font-family:Montserrat, sans-serif;
-      color:#fff;
-      background:#000;
-      text-align:center;
-      padding:20px;
-    ">
-      <div>
-        <h1 style="font-size:32px;margin-bottom:10px;">${title}</h1>
-        <p style="font-size:16px;opacity:0.7;">${message}</p>
-      </div>
+  document.getElementById("playerArea").innerHTML = `
+    <div style="width:100%;text-align:center;padding:40px 20px;color:#fff;">
+      <h1 style="font-size:32px;margin-bottom:10px;">${title}</h1>
+      <p style="font-size:16px;opacity:0.7;">${message}</p>
     </div>
   `;
+
   return false;
 }
 
-/* -------------------------
-   Theme handling
--------------------------- */
 function applyTheme(theme) {
   document.body.classList.remove("theme-light", "theme-dark");
   const t = (theme || "").toLowerCase();
-  if (t === "light") {
-    document.body.classList.add("theme-light");
-  } else {
-    document.body.classList.add("theme-dark");
-  }
+  if (t === "light") document.body.classList.add("theme-light");
+  else document.body.classList.add("theme-dark");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   applyTheme(params.get("theme"));
   window.addEventListener("message", (event) => {
-    if (event.data && event.data.theme) {
-      applyTheme(event.data.theme);
-    }
+    if (event.data && event.data.theme) applyTheme(event.data.theme);
   });
 });
 
-/* -------------------------
-   Player + metadata logic
--------------------------- */
 let audio;
 let playButton;
 let volumeBar;
@@ -483,8 +371,7 @@ let subEl;
 let artworkEl;
 let fallbackChip;
 
-const FALLBACK_ART =
-  "https://i.ibb.co/sd348dNG/Online-Radio-Album-Art-Fall-Back-1.png";
+const FALLBACK_ART = "https://i.ibb.co/sd348dNG/Online-Radio-Album-Art-Fall-Back-1.png";
 
 function initPlayer() {
   audio = new Audio();
@@ -499,8 +386,6 @@ function initPlayer() {
   artworkEl  = document.getElementById("artwork");
   fallbackChip = document.getElementById("fallbackChip");
 
-  if (!playButton || !titleEl || !subEl || !artworkEl) return;
-
   playButton.addEventListener("click", () => {
     if (audio.paused) {
       audio.play();
@@ -511,13 +396,12 @@ function initPlayer() {
     }
   });
 
+  audio.volume = volumeBar ? volumeBar.value / 100 : 1.0;
+
   if (volumeBar) {
-    audio.volume = volumeBar.value / 100;
     volumeBar.addEventListener("input", () => {
       audio.volume = volumeBar.value / 100;
     });
-  } else {
-    audio.volume = 1.0;
   }
 
   if (metaURL) {
@@ -546,11 +430,6 @@ function showFallback() {
 }
 
 async function fetchMetadata() {
-  if (!metaURL) {
-    applyFallbackMetadata();
-    return;
-  }
-
   try {
     const res = await fetch(metaURL + "?_=" + Date.now());
     const data = await res.json();
@@ -611,15 +490,11 @@ async function updateArtwork(title, artist) {
   }
 }
 
-/* -------------------------
-   Boot sequence
--------------------------- */
 checkLicense().then(valid => {
-  if (valid) {
-    initPlayer();
-  }
+  if (valid) initPlayer();
 });
 </script>
 
 </body>
 </html>
+
