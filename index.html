@@ -4,582 +4,322 @@
   <meta charset="UTF-8" />
   <title>Radio Nest Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg-main: #050308;
-      --bg-gradient-1: #4b2b20;
-      --bg-gradient-2: #141218;
-      --accent-orange: #ff9c35;
-      --accent-blue: #2f80ed;
-      --text-main: #ffffff;
-      --text-subtle: #e0dde5;
-      --text-muted: #a19bab;
-      --error: #ff4b5c;
-    }
 
-    * {
-      box-sizing: border-box;
+  <!-- Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
       margin: 0;
       padding: 0;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      background:
-        radial-gradient(circle at 15% 0, rgba(255, 200, 150, 0.4), transparent 55%),
-        radial-gradient(circle at 85% 100%, rgba(200, 140, 255, 0.35), transparent 55%),
-        radial-gradient(circle at 50% 50%, var(--bg-gradient-1), var(--bg-gradient-2));
-      min-height: 100vh;
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at 20% 0%, rgba(255,180,120,0.35), transparent 60%),
+                  radial-gradient(circle at 80% 100%, rgba(180,120,255,0.25), transparent 60%),
+                  #1a1414;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 12px;
-      color: var(--text-main);
-    }
-
-    .player-shell {
-      width: 100%;
-      max-width: 720px;
-      background: rgba(5, 3, 8, 0.9);
-      border-radius: 18px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 12px 14px 14px;
-      backdrop-filter: blur(18px);
-    }
-
-    .player-header {
-      display: flex;
       align-items: center;
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    .player-container {
+      width: 720px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    .top-bar {
+      display: flex;
       justify-content: space-between;
-      margin-bottom: 8px;
+      align-items: center;
+      margin-bottom: 14px;
     }
 
-    .brand-link {
-      font-size: 14px;
+    .brand {
+      color: #2f80ed;
       font-weight: 600;
-      color: var(--accent-blue);
       text-decoration: underline;
-      background: none;
-      border: none;
-      padding: 0;
       cursor: pointer;
+      font-size: 14px;
     }
 
-    .brand-link:hover,
-    .brand-link:focus {
-      text-decoration-thickness: 2px;
-    }
-
-    .onair-label {
-      font-size: 10px;
+    .onair {
+      font-size: 11px;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .onair-label span {
-      color: var(--accent-orange);
+      color: #ff9c35;
       font-weight: 600;
     }
 
-    .player-main {
+    .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.55fr);
-      gap: 14px;
-      align-items: stretch;
+      grid-template-columns: 240px 1fr;
+      gap: 18px;
     }
 
-    .art-wrap {
-      position: relative;
-      border-radius: 14px;
+    .art {
+      width: 100%;
+      height: 240px;
+      border-radius: 10px;
       overflow: hidden;
-      background: radial-gradient(circle at top, #4b296d, #040308);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      aspect-ratio: 1 / 1;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.1);
+      position: relative;
     }
 
-    .art-image {
+    .art img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
     }
 
-    .art-overlay {
+    .fallback-tag {
       position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.7),
-        rgba(0, 0, 0, 0.2) 45%,
-        transparent
-      );
-      pointer-events: none;
-    }
-
-    .art-tag {
-      position: absolute;
-      left: 8px;
       bottom: 8px;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+      left: 8px;
+      background: rgba(0,0,0,0.6);
       padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.7);
-      color: var(--text-muted);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ccc;
     }
 
-    .player-right {
+    .meta-area {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 8px;
     }
 
-    .meta-top {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .onair-header {
-      font-size: 10px;
-      text-transform: uppercase;
+    .meta-header {
+      font-size: 11px;
       letter-spacing: 0.18em;
-      color: var(--text-muted);
-    }
-
-    .onair-header span {
-      color: var(--accent-orange);
+      text-transform: uppercase;
+      color: #ff9c35;
       font-weight: 600;
+      margin-bottom: 6px;
     }
 
-    .track-title {
-      font-size: 22px;
+    .title {
+      font-size: 26px;
       font-weight: 700;
-      letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: var(--text-main);
-      line-height: 1.1;
-      min-height: 1.2em;
+      margin-bottom: 4px;
     }
 
-    .track-artist {
-      font-size: 13px;
-      letter-spacing: 0.2em;
+    .artist {
+      font-size: 14px;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text-subtle);
-      min-height: 1.1em;
+      color: #ddd;
+      margin-bottom: 10px;
     }
 
     .fallback-text {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
+      font-size: 12px;
+      color: #aaa;
     }
 
-    .controls-row {
+    .controls {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-top: 6px;
-      gap: 10px;
+      gap: 14px;
     }
 
-    .play-button {
+    .play-btn {
       width: 48px;
       height: 48px;
       border-radius: 50%;
       border: none;
-      background: radial-gradient(circle at 30% 20%, #ffffff, #ffb057);
-      color: #000000;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      background: #fff;
+      color: #000;
+      font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
-      flex-shrink: 0;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+      font-size: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
 
-    .play-button:active {
-      transform: translateY(1px) scale(0.98);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75);
-      filter: brightness(0.96);
-    }
-
-    .play-icon-shape {
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 9px 0 9px 14px;
-      border-color: transparent transparent transparent #000000;
-      margin-left: 2px;
-    }
-
-    .pause-icon {
-      display: flex;
-      gap: 4px;
-    }
-
-    .pause-bar {
-      width: 3px;
-      height: 16px;
-      border-radius: 999px;
-      background: #000000;
-    }
-
-    .volume-wrap {
+    .volume {
       flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .volume-icon {
-      width: 18px;
-      height: 18px;
-      color: var(--text-subtle);
-      flex-shrink: 0;
-    }
-
-    .volume-slider {
-      -webkit-appearance: none;
-      appearance: none;
+    .volume input {
       width: 100%;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.18);
-      outline: none;
-      cursor: pointer;
     }
 
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 2px solid var(--accent-orange);
-      box-shadow: 0 0 0 3px rgba(255, 156, 53, 0.45);
-      margin-top: -5px;
-    }
-
-    .volume-slider::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 2px solid var(--accent-orange);
-      box-shadow: 0 0 0 3px rgba(255, 156, 53, 0.45);
-    }
-
-    .volume-slider::-moz-range-track {
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.18);
-    }
-
-    .footer-row {
-      margin-top: 6px;
+    .footer {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #bbb;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-size: 10px;
-      color: var(--text-muted);
-      gap: 8px;
     }
 
-    .meta-status.error {
-      color: var(--error);
-    }
-
-    @media (max-width: 640px) {
-      .player-main {
-        grid-template-columns: 1fr;
-      }
-
-      .art-wrap {
-        max-width: 260px;
-        margin: 0 auto;
-      }
+    .error {
+      color: #ff4b5c;
     }
   </style>
 </head>
+
 <body>
-  <div class="player-shell">
-    <div class="player-header">
-      <button
-        class="brand-link"
-        type="button"
-        onclick="window.open('https://myradionest.com', '_blank')"
-      >
-        Radio Nest Player
-      </button>
-      <div class="onair-label">
-        <span>On Air</span> • Now Playing
-      </div>
-    </div>
 
-    <div class="player-main">
-      <!-- LEFT: ARTWORK -->
-      <div class="art-wrap">
-        <img
-          id="albumArt"
-          class="art-image"
-          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png"
-          alt="Album art"
-        />
-        <div class="art-overlay"></div>
-        <div id="artTag" class="art-tag">Radio - Live Stream</div>
-      </div>
+<div class="player-container">
 
-      <!-- RIGHT: METADATA & CONTROLS -->
-      <div class="player-right">
-        <div class="meta-top">
-          <div class="onair-header">
-            <span>On Air</span> • Now Playing
-          </div>
-          <div id="trackTitle" class="track-title">Loading...</div>
-          <div id="trackArtist" class="track-artist"></div>
-          <div id="fallbackText" class="fallback-text">
-            Radio - Live Stream
-          </div>
-        </div>
-
-        <div>
-          <div class="controls-row">
-            <button id="playPauseBtn" class="play-button" type="button">
-              <div id="playIcon" class="play-icon-shape"></div>
-            </button>
-
-            <div class="volume-wrap">
-              <div class="volume-icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="18"
-                  height="18"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M4 9v6h3l4 4V5L7 9H4zm10.54-4.46L13.83 6.3A4.978 4.978 0 0 1 16 9c0 1.3-.5 2.55-1.46 3.46l.71 1.76A6.96 6.96 0 0 0 18 9a6.96 6.96 0 0 0-3.46-4.46z"
-                  ></path>
-                </svg>
-              </div>
-              <input
-                id="volumeSlider"
-                class="volume-slider"
-                type="range"
-                min="0"
-                max="100"
-                value="100"
-              />
-            </div>
-          </div>
-
-          <div class="footer-row">
-            <span>Artwork via iTunes Search API</span>
-            <span id="metaStatus" class="meta-status">Updating every 15s</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="top-bar">
+    <div class="brand" onclick="window.open('https://myradionest.com','_blank')">Radio Nest Player</div>
+    <div class="onair">ON AIR • NOW PLAYING</div>
   </div>
 
-  <audio id="audioElement"></audio>
+  <div class="layout">
 
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const streamUrl = params.get("stream") || "";
-      const metaUrl = params.get("meta") || "";
+    <div class="art">
+      <img id="albumArt" src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png">
+      <div id="fallbackTag" class="fallback-tag">Radio - Live Stream</div>
+    </div>
 
-      const refreshIntervalMs = 15000; // 15 seconds
+    <div class="meta-area">
 
-      const FALLBACK_ART =
-        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-      const FALLBACK_TEXT = "Radio - Live Stream";
+      <div>
+        <div class="meta-header">ON AIR • NOW PLAYING</div>
+        <div id="trackTitle" class="title">Loading...</div>
+        <div id="trackArtist" class="artist"></div>
+        <div id="fallbackText" class="fallback-text">Radio - Live Stream</div>
+      </div>
 
-      const audioEl = document.getElementById("audioElement");
-      const playPauseBtn = document.getElementById("playPauseBtn");
-      const playIcon = document.getElementById("playIcon");
-      const volumeSlider = document.getElementById("volumeSlider");
-      const albumArt = document.getElementById("albumArt");
-      const artTag = document.getElementById("artTag");
-      const trackTitleEl = document.getElementById("trackTitle");
-      const trackArtistEl = document.getElementById("trackArtist");
-      const fallbackTextEl = document.getElementById("fallbackText");
-      const metaStatusEl = document.getElementById("metaStatus");
+      <div class="controls">
+        <button id="playBtn" class="play-btn">Play</button>
+        <div class="volume">
+          <input id="volumeSlider" type="range" min="0" max="100" value="100">
+        </div>
+      </div>
 
-      function setPlayVisual(isPlaying) {
-        if (!playIcon) return;
-        playIcon.innerHTML = "";
-        if (isPlaying) {
-          const wrap = document.createElement("div");
-          wrap.className = "pause-icon";
-          const bar1 = document.createElement("div");
-          bar1.className = "pause-bar";
-          const bar2 = document.createElement("div");
-          bar2.className = "pause-bar";
-          wrap.appendChild(bar1);
-          wrap.appendChild(bar2);
-          playIcon.appendChild(wrap);
-        } else {
-          playIcon.className = "play-icon-shape";
-        }
+      <div class="footer">
+        <span>Artwork via iTunes Search API</span>
+        <span id="metaStatus">Updating every 15s</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+(function() {
+
+  const params = new URLSearchParams(window.location.search);
+  const stream = params.get("stream") || "";
+  const meta = params.get("meta") || "";
+
+  const audio = document.getElementById("audio");
+  const playBtn = document.getElementById("playBtn");
+  const volumeSlider = document.getElementById("volumeSlider");
+
+  const albumArt = document.getElementById("albumArt");
+  const fallbackTag = document.getElementById("fallbackTag");
+  const trackTitle = document.getElementById("trackTitle");
+  const trackArtist = document.getElementById("trackArtist");
+  const fallbackText = document.getElementById("fallbackText");
+  const metaStatus = document.getElementById("metaStatus");
+
+  const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+  const FALLBACK_TEXT = "Radio - Live Stream";
+
+  audio.src = stream;
+  audio.volume = 1.0;
+
+  playBtn.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play();
+      playBtn.textContent = "Stop";
+    } else {
+      audio.pause();
+      playBtn.textContent = "Play";
+    }
+  });
+
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = volumeSlider.value / 100;
+  });
+
+  async function updateMetadata() {
+    if (!meta) {
+      metaStatus.textContent = "No metadata source configured";
+      metaStatus.classList.add("error");
+      return;
+    }
+
+    metaStatus.textContent = "Updating...";
+
+    try {
+      const res = await fetch(meta, { cache: "no-store" });
+      const data = await res.json();
+
+      const artist = data.artist || "";
+      const title = data.title || "";
+
+      if (!artist && !title) {
+        trackTitle.textContent = FALLBACK_TEXT;
+        trackArtist.textContent = "";
+        fallbackText.textContent = FALLBACK_TEXT;
+        albumArt.src = FALLBACK_ART;
+        fallbackTag.style.display = "block";
+        return;
       }
 
-      if (streamUrl) {
-        audioEl.src = streamUrl;
+      trackTitle.textContent = title;
+      trackArtist.textContent = artist;
+      fallbackText.textContent = FALLBACK_TEXT;
+      fallbackTag.style.display = "none";
+
+      await updateArtwork(artist, title);
+
+      metaStatus.textContent = "Updated just now";
+
+    } catch (e) {
+      metaStatus.textContent = "Metadata error";
+      metaStatus.classList.add("error");
+      albumArt.src = FALLBACK_ART;
+      fallbackTag.style.display = "block";
+    }
+  }
+
+  async function updateArtwork(artist, title) {
+    const query = encodeURIComponent(`${artist} ${title}`);
+    const url = `https://itunes.apple.com/search?media=music&limit=1&term=${query}`;
+
+    try {
+      const res = await fetch(url);
+      const json = await res.json();
+
+      if (!json.results.length) {
+        albumArt.src = FALLBACK_ART;
+        fallbackTag.style.display = "block";
+        return;
       }
 
-      audioEl.volume = 1.0;
-      volumeSlider.value = 100;
+      const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
+      albumArt.src = art;
+      fallbackTag.style.display = "none";
 
-      playPauseBtn.addEventListener("click", () => {
-        if (!audioEl.src) return;
-        if (audioEl.paused) {
-          audioEl
-            .play()
-            .then(() => setPlayVisual(true))
-            .catch((err) => console.error("Playback error:", err));
-        } else {
-          audioEl.pause();
-          setPlayVisual(false);
-        }
-      });
+    } catch {
+      albumArt.src = FALLBACK_ART;
+      fallbackTag.style.display = "block";
+    }
+  }
 
-      audioEl.addEventListener("play", () => setPlayVisual(true));
-      audioEl.addEventListener("pause", () => setPlayVisual(false));
+  updateMetadata();
+  setInterval(updateMetadata, 15000);
 
-      volumeSlider.addEventListener("input", () => {
-        const v = Number(volumeSlider.value || 0);
-        audioEl.volume = Math.min(Math.max(v / 100, 0), 1);
-      });
+})();
+</script>
 
-      async function fetchMetadata() {
-        if (!metaUrl) {
-          metaStatusEl.textContent = "No metadata source configured";
-          metaStatusEl.classList.add("error");
-          return;
-        }
-
-        metaStatusEl.textContent = "Updating...";
-        metaStatusEl.classList.remove("error");
-
-        try {
-          const res = await fetch(metaUrl, { cache: "no-store" });
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          const data = await res.json();
-
-          const artist = (data.artist || "").toString().trim();
-          const title = (data.title || "").toString().trim();
-
-          if (!artist && !title) {
-            trackTitleEl.textContent = FALLBACK_TEXT;
-            trackArtistEl.textContent = "";
-            fallbackTextEl.textContent = FALLBACK_TEXT;
-            albumArt.src = FALLBACK_ART;
-            if (artTag) {
-              artTag.style.display = "inline-flex";
-              artTag.textContent = FALLBACK_TEXT;
-            }
-            metaStatusEl.textContent = "No track info in metadata";
-            return;
-          }
-
-          trackTitleEl.textContent = title || FALLBACK_TEXT;
-          trackArtistEl.textContent = artist || "";
-          fallbackTextEl.textContent = FALLBACK_TEXT;
-
-          if (artTag) artTag.style.display = "none";
-
-          await updateArtworkFromItunes(artist, title);
-          metaStatusEl.textContent = "Updated just now";
-        } catch (err) {
-          console.error("Metadata error:", err);
-          metaStatusEl.textContent = "Metadata error";
-          metaStatusEl.classList.add("error");
-
-          if (!trackTitleEl.textContent || trackTitleEl.textContent === "Loading...") {
-            trackTitleEl.textContent = FALLBACK_TEXT;
-          }
-          albumArt.src = FALLBACK_ART;
-          if (artTag) {
-            artTag.style.display = "inline-flex";
-            artTag.textContent = FALLBACK_TEXT;
-          }
-        }
-      }
-
-      async function updateArtworkFromItunes(artist, title) {
-        const query = encodeURIComponent(`${artist} ${title}`.trim());
-        if (!query) {
-          albumArt.src = FALLBACK_ART;
-          if (artTag) {
-            artTag.style.display = "inline-flex";
-            artTag.textContent = FALLBACK_TEXT;
-          }
-          return;
-        }
-
-        const url = `https://itunes.apple.com/search?media=music&limit=1&term=${query}`;
-
-        try {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          const json = await res.json();
-
-          if (!json.results || !json.results.length) {
-            albumArt.src = FALLBACK_ART;
-            if (artTag) {
-              artTag.style.display = "inline-flex";
-              artTag.textContent = FALLBACK_TEXT;
-            }
-            return;
-          }
-
-          const artUrl =
-            json.results[0].artworkUrl100 || json.results[0].artworkUrl60;
-          if (!artUrl) {
-            albumArt.src = FALLBACK_ART;
-            if (artTag) {
-              artTag.style.display = "inline-flex";
-              artTag.textContent = FALLBACK_TEXT;
-            }
-            return;
-          }
-
-          const hiRes = artUrl.replace(/100x100bb\.jpg|60x60bb\.jpg/, "300x300bb.jpg");
-          albumArt.src = hiRes;
-          if (artTag) artTag.style.display = "none";
-        } catch (err) {
-          console.error("Artwork error:", err);
-          albumArt.src = FALLBACK_ART;
-          if (artTag) {
-            artTag.style.display = "inline-flex";
-            artTag.textContent = FALLBACK_TEXT;
-          }
-        }
-      }
-
-      if (metaUrl) {
-        fetchMetadata();
-        setInterval(fetchMetadata, refreshIntervalMs);
-      } else {
-        metaStatusEl.textContent = "No metadata source configured";
-        metaStatusEl.classList.add("error");
-      }
-
-      setPlayVisual(false);
-    })();
-  </script>
 </body>
 </html>
-
