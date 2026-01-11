@@ -210,6 +210,7 @@
       width: 220px;
     }
 
+    /* Updated, cross-browser, theme-aware volume slider */
     .volume-bar {
       width: 100%;
       height: 6px;
@@ -217,7 +218,57 @@
       cursor: pointer;
       background: var(--slider-track);
       outline: none;
+      border: none;
+      -webkit-appearance: none;
       appearance: none;
+    }
+
+    /* WebKit (Chrome, Edge, Safari) track */
+    .volume-bar::-webkit-slider-runnable-track {
+      background: var(--slider-track);
+      height: 6px;
+      border-radius: 999px;
+    }
+
+    /* WebKit thumb */
+    .volume-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      border: none;
+      margin-top: -4px; /* centres thumb on 6px track */
+      box-shadow: 0 0 0 0 transparent;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .volume-bar::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 6px var(--slider-thumb-glow);
+      transform: scale(1.05);
+    }
+
+    /* Firefox track */
+    .volume-bar::-moz-range-track {
+      background: var(--slider-track);
+      height: 6px;
+      border-radius: 999px;
+    }
+
+    /* Firefox thumb */
+    .volume-bar::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--slider-thumb);
+      border: none;
+      box-shadow: 0 0 0 0 transparent;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .volume-bar::-moz-range-thumb:hover {
+      box-shadow: 0 0 0 6px var(--slider-thumb-glow);
+      transform: scale(1.05);
     }
 
     @media (max-width: 1024px) {
@@ -496,5 +547,3 @@ checkLicense().then(valid => {
 
 </body>
 </html>
-
-
