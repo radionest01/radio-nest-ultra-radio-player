@@ -16,185 +16,102 @@
       --text-muted: #a59fb2;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
-      font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Montserrat", system-ui, sans-serif;
       color: var(--text-main);
       background:
-        radial-gradient(circle at 10% 0%, rgba(255, 190, 130, 0.35), transparent 60%),
-        radial-gradient(circle at 90% 100%, rgba(178, 120, 255, 0.35), transparent 55%),
+        radial-gradient(circle at 10% 0%, rgba(255,190,130,0.35), transparent 60%),
+        radial-gradient(circle at 90% 100%, rgba(178,120,255,0.35), transparent 55%),
         #08050b;
       padding: 40px 50px;
     }
 
-    .page-wrap {
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+    .page-wrap { max-width: 1400px; margin: 0 auto; }
 
-    .masthead {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      margin-bottom: 10px;
-    }
+    .masthead { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
 
     .masthead-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--accent-blue);
-      text-decoration: underline;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-      text-align: left;
+      font-size: 17px; font-weight: 700; color: var(--accent-blue);
+      text-decoration: underline; cursor: pointer; background: none; border: none;
+      padding: 0; text-align: left;
     }
 
     .masthead-sub {
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
       color: var(--text-muted);
     }
 
     .player-layout {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 40px;
-      align-items: flex-start;
+      display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;
     }
 
     .art-wrap {
-      flex: 0 0 400px;
-      aspect-ratio: 1 / 1;
-      background: #000;
-      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.85);
-      overflow: hidden;
-      position: relative;
+      flex: 0 0 400px; aspect-ratio: 1/1; background: #000;
+      box-shadow: 0 22px 40px rgba(0,0,0,0.85); overflow: hidden; position: relative;
     }
 
-    .art-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .art-img { width: 100%; height: 100%; object-fit: cover; }
 
     .fallback-chip {
-      position: absolute;
-      left: 10px;
-      bottom: 10px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.72);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
+      position: absolute; left: 10px; bottom: 10px;
+      padding: 4px 10px; border-radius: 999px;
+      background: rgba(0,0,0,0.72); border: 1px solid rgba(255,255,255,0.3);
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
       color: var(--text-muted);
     }
 
-    .meta-wrap {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
+    .meta-wrap { flex: 1; display: flex; flex-direction: column; }
 
     .onair-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: var(--text-muted);
-      margin-bottom: 8px;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em;
+      color: var(--text-muted); margin-bottom: 8px;
     }
 
-    .onair-label span {
-      color: var(--accent-orange);
-      font-weight: 600;
-    }
+    .onair-label span { color: var(--accent-orange); font-weight: 600; }
 
     .track-title {
-      font-size: clamp(28px, 4vw, 36px);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 4px;
-      min-height: 1.2em;
+      font-size: clamp(28px, 4vw, 36px); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      margin-bottom: 4px; min-height: 1.2em;
     }
 
     .track-artist {
-      font-size: clamp(14px, 2vw, 16px);
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: var(--text-sub);
-      margin-bottom: 10px;
-      min-height: 1.1em;
+      font-size: clamp(14px, 2vw, 16px); text-transform: uppercase;
+      letter-spacing: 0.22em; color: var(--text-sub);
+      margin-bottom: 10px; min-height: 1.1em;
     }
 
-    .track-sub {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 18px;
-    }
+    .track-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 18px; }
 
-    .controls-block {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
+    .controls-block { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
 
     .play-btn {
-      width: 140px;
-      height: 42px;
-      border-radius: 8px;
-      background: #ffffff;
-      color: #000000;
-      font-size: 14px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+      width: 140px; height: 42px; border-radius: 8px;
+      background: #fff; color: #000; font-size: 14px; font-weight: 700;
+      border: none; cursor: pointer; box-shadow: 0 8px 18px rgba(0,0,0,0.6);
     }
 
-    .volume-wrap {
-      width: 200px;
-    }
+    .volume-wrap { width: 200px; }
 
     .volume-bar {
-      width: 100%;
-      -webkit-appearance: none;
-      appearance: none;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.26);
-      outline: none;
-      cursor: pointer;
+      width: 100%; height: 4px; border-radius: 999px;
+      background: rgba(255,255,255,0.26); cursor: pointer;
+      -webkit-appearance: none; appearance: none;
     }
 
     .volume-bar::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.45);
+      -webkit-appearance: none; appearance: none;
     }
   </style>
 </head>
-
 <body>
   <div class="page-wrap">
+
     <div class="masthead">
       <button class="masthead-title" onclick="window.open('https://myradionest.com', '_blank')">
         RADIO NEST PLAYER
@@ -205,7 +122,7 @@
     <main class="player-layout">
       <div class="art-wrap">
         <img id="albumArt" class="art-img"
-          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png" alt="Album art">
+          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png">
         <div id="fallbackChip" class="fallback-chip">RADIO - LIVE STREAM</div>
       </div>
 
@@ -227,152 +144,138 @@
     </main>
 
     <audio id="audioEl"></audio>
+<script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const streamUrl = params.get("stream") || "";
+  let metaUrl = params.get("meta") || "";
 
-    <script>
-      (function () {
-        const params = new URLSearchParams(window.location.search);
-        const streamUrl = params.get("stream") || "";
-        let metaUrl = params.get("meta") || "";
+  // Always wrap metadata URL in AllOrigins proxy
+  if (metaUrl) {
+    metaUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(metaUrl);
+  }
 
-        // Always wrap the provided meta URL in the AllOrigins proxy
-        if (metaUrl) {
-          metaUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(metaUrl);
-        }
+  const audio = document.getElementById("audioEl");
+  const playBtn = document.getElementById("playBtn");
+  const volumeSlider = document.getElementById("volumeSlider");
+  const albumArt = document.getElementById("albumArt");
+  const fallbackChip = document.getElementById("fallbackChip");
+  const trackTitleEl = document.getElementById("trackTitle");
+  const trackArtistEl = document.getElementById("trackArtist");
+  const trackSubEl = document.getElementById("trackSub");
 
-        const audio = document.getElementById("audioEl");
-        const playBtn = document.getElementById("playBtn");
-        const volumeSlider = document.getElementById("volumeSlider");
-        const albumArt = document.getElementById("albumArt");
-        const fallbackChip = document.getElementById("fallbackChip");
-        const trackTitleEl = document.getElementById("trackTitle");
-        const trackArtistEl = document.getElementById("trackArtist");
-        const trackSubEl = document.getElementById("trackSub");
+  const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+  const FALLBACK_TEXT = "Radio - Live Stream";
 
-        const FALLBACK_ART =
-          "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-        const FALLBACK_TEXT = "Radio - Live Stream";
+  if (streamUrl) audio.src = streamUrl;
+  audio.volume = 1.0;
 
-        if (streamUrl) audio.src = streamUrl;
-        audio.volume = 1.0;
+  playBtn.addEventListener("click", () => {
+    if (!audio.src) return;
 
-        playBtn.addEventListener("click", () => {
-          if (!audio.src) return;
+    if (audio.paused) {
+      audio.play().then(() => playBtn.textContent = "Stop");
+    } else {
+      audio.pause();
+      playBtn.textContent = "Play";
+    }
+  });
 
-          if (audio.paused) {
-            audio.play().then(() => {
-              playBtn.textContent = "Stop";
-            }).catch(() => {});
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
+  });
+
+  async function fetchMetadata() {
+    if (!metaUrl) return;
+
+    try {
+      const res = await fetch(metaUrl, { cache: "no-store" });
+      const data = await res.json();
+
+      let artist = "";
+      let title = "";
+
+      // ICECAST
+      if (data.icestats) {
+        let source = data.icestats.source;
+        if (Array.isArray(source)) source = source[0];
+
+        if (source && source.title) {
+          const raw = source.title.trim();
+          if (raw.includes(" - ")) {
+            const parts = raw.split(" - ");
+            artist = parts[0].trim();
+            title = parts[1].trim();
           } else {
-            audio.pause();
-            playBtn.textContent = "Play";
-          }
-        });
-
-        volumeSlider.addEventListener("input", () => {
-          audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
-        });
-
-        async function fetchMetadata() {
-          if (!metaUrl) {
-            albumArt.src = FALLBACK_ART;
-            fallbackChip.style.display = "inline-flex";
-            return;
-          }
-
-          try {
-            const res = await fetch(metaUrl, { cache: "no-store" });
-            const data = await res.json();
-
-            let artist = "";
-            let title = "";
-
-            // ICECAST: icestats.source or icestats.source[0]
-            if (data.icestats) {
-              let source = data.icestats.source;
-
-              if (Array.isArray(source)) {
-                source = source[0];
-              }
-
-              if (source && source.title) {
-                const raw = source.title.trim();
-
-                if (raw.includes(" - ")) {
-                  const parts = raw.split(" - ");
-                  artist = parts[0].trim();
-                  title = parts[1].trim();
-                } else {
-                  title = raw;
-                }
-              }
-            }
-
-            // SHOUTCAST: data.artist / data.title
-            if (data.artist) artist = data.artist.trim();
-            if (data.title) title = data.title.trim();
-
-            if (!artist && !title) {
-              trackTitleEl.textContent = "Loading...";
-              trackArtistEl.textContent = "";
-              trackSubEl.textContent = FALLBACK_TEXT;
-              albumArt.src = FALLBACK_ART;
-              fallbackChip.style.display = "inline-flex";
-              return;
-            }
-
-            trackTitleEl.textContent = title || FALLBACK_TEXT;
-            trackArtistEl.textContent = artist || "";
-            trackSubEl.textContent = FALLBACK_TEXT;
-
-            await updateArtwork(artist, title);
-
-          } catch (e) {
-            trackTitleEl.textContent = FALLBACK_TEXT;
-            trackArtistEl.textContent = "";
-            trackSubEl.textContent = FALLBACK_TEXT;
-            albumArt.src = FALLBACK_ART;
-            fallbackChip.style.display = "inline-flex";
+            title = raw;
           }
         }
+      }
 
-        async function updateArtwork(artist, title) {
-          const q = `${artist} ${title}`.trim();
-          if (!q) {
-            albumArt.src = FALLBACK_ART;
-            fallbackChip.style.display = "inline-flex";
-            return;
-          }
+      // SHOUTCAST
+      if (data.artist) artist = data.artist.trim();
+      if (data.title) title = data.title.trim();
 
-          try {
-            const res = await fetch(
-              `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
-            );
-            const json = await res.json();
+      if (!artist && !title) {
+        trackTitleEl.textContent = "Loading...";
+        trackArtistEl.textContent = "";
+        albumArt.src = FALLBACK_ART;
+        fallbackChip.style.display = "inline-flex";
+        return;
+      }
 
-            if (!json.results.length) {
-              albumArt.src = FALLBACK_ART;
-              fallbackChip.style.display = "inline-flex";
-              return;
-            }
+      trackTitleEl.textContent = title || FALLBACK_TEXT;
+      trackArtistEl.textContent = artist || "";
+      trackSubEl.textContent = FALLBACK_TEXT;
 
-            const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
-            albumArt.src = art;
-            fallbackChip.style.display = "none";
-          } catch {
-            albumArt.src = FALLBACK_ART;
-            fallbackChip.style.display = "inline-flex";
-          }
-        }
+      await updateArtwork(artist, title);
 
-        if (metaUrl) {
-          fetchMetadata();
-          setInterval(fetchMetadata, 15000);
-        } else {
-          albumArt.src = FALLBACK_ART;
-          fallbackChip.style.display = "inline-flex";
-        }
-      })();
-    </script>
-  </div>
+    } catch {
+      albumArt.src = FALLBACK_ART;
+      fallbackChip.style.display = "inline-flex";
+    }
+  }
+
+  async function updateArtwork(artist, title) {
+    const q = `${artist} ${title}`.trim();
+    if (!q) {
+      albumArt.src = FALLBACK_ART;
+      fallbackChip.style.display = "inline-flex";
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
+      );
+      const json = await res.json();
+
+      if (!json.results.length) {
+        albumArt.src = FALLBACK_ART;
+        fallbackChip.style.display = "inline-flex";
+        return;
+      }
+
+      // Upscale to 1200x1200
+      const art = json.results[0].artworkUrl100
+        .replace("100x100bb.jpg", "1200x1200bb.jpg")
+        .replace("100x100bb.png", "1200x1200bb.png");
+
+      albumArt.src = art;
+      fallbackChip.style.display = "none";
+
+    } catch {
+      albumArt.src = FALLBACK_ART;
+      fallbackChip.style.display = "inline-flex";
+    }
+  }
+
+  if (metaUrl) {
+    fetchMetadata();
+    setInterval(fetchMetadata, 15000);
+  }
+})();
+</script>
+
 </body>
 </html>
