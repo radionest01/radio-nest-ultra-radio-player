@@ -13,14 +13,14 @@
       --glass: rgba(0,0,0,0.25);
     }
 
-    /* DARK THEME = BLACK TEXT */
+    /* DARK = BLACK TEXT */
     .theme-dark {
       --text: #000;
       --subtext: rgba(0,0,0,0.7);
       --glass: rgba(0,0,0,0.25);
     }
 
-    /* LIGHT THEME = WHITE TEXT */
+    /* LIGHT = WHITE TEXT */
     .theme-light {
       --text: #fff;
       --subtext: rgba(255,255,255,0.7);
@@ -54,7 +54,7 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       padding: 40px 50px;
       box-sizing: border-box;
       overflow: hidden;
@@ -85,7 +85,7 @@
     .player-layout {
       display: flex;
       gap: 40px;
-      align-items: center;
+      align-items: flex-start;
       flex-wrap: nowrap;
       overflow: hidden;
     }
@@ -103,6 +103,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border-radius: 12px;
     }
 
     .fallback-chip {
@@ -143,15 +144,21 @@
       color: #ff9c35;
     }
 
+    .track-title,
+    .track-artist,
+    .track-sub {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      word-break: break-word;
+    }
+
     .track-title {
       font-size: clamp(28px, 4vw, 36px);
       font-weight: 700;
       text-transform: uppercase;
       margin-bottom: 4px;
       color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .track-artist {
@@ -160,18 +167,12 @@
       letter-spacing: 0.22em;
       margin-bottom: 10px;
       color: var(--subtext);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .track-sub {
       font-size: 14px;
       color: var(--subtext);
       margin-bottom: 18px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .controls-block {
@@ -267,13 +268,9 @@ const metaURL = params.get("meta");
 -------------------------------- */
 function applyTheme(theme) {
   document.body.classList.remove("theme-light", "theme-dark");
-
   const t = (theme || "").toLowerCase();
-
   if (t === "light") {
     document.body.classList.add("theme-light");
-  } else if (t === "dark") {
-    document.body.classList.add("theme-dark");
   } else {
     document.body.classList.add("theme-dark");
   }
@@ -281,7 +278,6 @@ function applyTheme(theme) {
 
 document.addEventListener("DOMContentLoaded", () => {
   applyTheme(params.get("theme"));
-
   window.addEventListener("message", (event) => {
     if (event.data && event.data.theme) {
       applyTheme(event.data.theme);
@@ -423,4 +419,3 @@ async function updateArtwork(title, artist) {
 
 </body>
 </html>
-
