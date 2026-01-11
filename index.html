@@ -190,26 +190,6 @@ input[type=range]::-moz-range-track {
   border-radius: 999px;
 }
 
-/* Store badges area (optional, like in your screenshot) */
-.store-row {
-  display: flex;
-  gap: 12px;
-  margin-top: 18px;
-  flex-wrap: wrap;
-  opacity: 0.9;
-}
-
-.store-badge {
-  background: rgba(255,255,255,0.06);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: default;
-}
-
 /* Mobile responsiveness */
 @media (max-width: 720px) {
   .player-shell {
@@ -256,7 +236,7 @@ input[type=range]::-moz-range-track {
         src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png"
         alt="Album art" />
       <div class="artwork-caption" id="artworkCaption">
-        Radio Nest • Live Stream
+        Radio – Live Stream
       </div>
     </section>
 
@@ -264,7 +244,7 @@ input[type=range]::-moz-range-track {
     <section class="info-wrap">
       <div>
         <div class="now-label">ON AIR NOW PLAYING</div>
-        <div class="now-title" id="trackTitle">Radio Nest</div>
+        <div class="now-title" id="trackTitle">Radio</div>
         <div class="now-artist" id="trackArtist">Live Stream</div>
 
         <div class="controls-row">
@@ -279,15 +259,6 @@ input[type=range]::-moz-range-track {
               max="1"
               step="0.01"
               value="1" />
-          </div>
-        </div>
-
-        <div class="store-row">
-          <div class="store-badge">
-            <span>Get it on</span><strong>Google Play</strong>
-          </div>
-          <div class="store-badge">
-            <span>Download on the</span><strong>App Store</strong>
           </div>
         </div>
       </div>
@@ -314,15 +285,13 @@ const albumArtEl   = document.getElementById("albumArt");
 const artworkCaptionEl = document.getElementById("artworkCaption");
 
 /* --- Fallbacks --- */
-const FALLBACK_TITLE = "Radio Nest";
+const FALLBACK_TITLE = "Radio";
 const FALLBACK_ARTIST = "Live Stream";
 const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
 
 /* --- Basic setup --- */
 if (streamUrl) {
   audio.src = streamUrl;
-} else {
-  console.warn("Radio Nest Player: no ?stream= URL provided.");
 }
 
 audio.volume = 1;
@@ -334,18 +303,14 @@ volumeSlider.addEventListener("input", () => {
 let isPlaying = false;
 
 playBtn.addEventListener("click", async () => {
-  if (!streamUrl) {
-    console.warn("Radio Nest Player: cannot play, no streamUrl set.");
-    return;
-  }
+  if (!streamUrl) return;
+
   if (!isPlaying) {
     try {
       await audio.play();
       isPlaying = true;
       playBtn.textContent = "PAUSE";
-    } catch (e) {
-      console.error("Playback error:", e);
-    }
+    } catch (e) {}
   } else {
     audio.pause();
     isPlaying = false;
@@ -366,7 +331,6 @@ function splitArtistTitle(str) {
 function parseMetadata(data) {
   if (!data) return {};
 
-  // Icecast / SHOUTcast style via icestats
   if (data.icestats && data.icestats.source) {
     const src = Array.isArray(data.icestats.source)
       ? data.icestats.source[0]
@@ -374,12 +338,10 @@ function parseMetadata(data) {
     return splitArtistTitle(src.title || "");
   }
 
-  // Shoutcast JSON
   if (data.songtitle) {
     return splitArtistTitle(data.songtitle);
   }
 
-  // AzuraCast now_playing
   if (data.now_playing && data.now_playing.song) {
     return {
       artist: data.now_playing.song.artist || "",
@@ -387,7 +349,6 @@ function parseMetadata(data) {
     };
   }
 
-  // Generic { song: { artist, title } }
   if (data.song && data.song.title) {
     return {
       artist: data.song.artist || "",
@@ -395,7 +356,6 @@ function parseMetadata(data) {
     };
   }
 
-  // Generic { title, artist }
   if (data.title && data.artist) {
     return {
       artist: data.artist,
@@ -403,7 +363,6 @@ function parseMetadata(data) {
     };
   }
 
-  // Generic single string fields
   if (data.title) return splitArtistTitle(data.title);
   if (data.song)  return splitArtistTitle(data.song);
 
@@ -414,17 +373,17 @@ function parseMetadata(data) {
 function cleanForSearch(str) {
   if (!str) return "";
   let s = str;
-  s = s.replace(/\(.*?\)/g, ""); // remove (Live), (Remastered)
+  s = s.replace(/\(.*?\)/g, "");
   s = s.replace(/
 
 \[.*?\]
 
-/g, ""); // remove [2023]
+/g, "");
   s = s.replace(/\s+/g, " ");
   return s.trim();
 }
 
-/* --- Artwork lookup (strict match) --- */
+/* --- Artwork lookup --- */
 async function fetchAlbumArt(artist, title) {
   const cleanArtist = cleanForSearch(artist);
   const cleanTitle  = cleanForSearch(title);
@@ -478,17 +437,13 @@ async function fetchAlbumArt(artist, title) {
     art = art.replace("100x100", "600x600");
     albumArtEl.src = art;
   } catch (e) {
-    console.error("Artwork fetch error:", e);
     albumArtEl.src = FALLBACK_ART;
   }
 }
 
 /* --- Metadata updater --- */
 async function updateMetadata() {
-  if (!metaUrl) {
-    console.warn("Radio Nest Player: no ?meta= URL provided.");
-    return;
-  }
+  if (!metaUrl) return;
 
   try {
     const res  = await fetch(metaUrl);
@@ -501,12 +456,10 @@ async function updateMetadata() {
 
     trackTitleEl.textContent     = safeTitle;
     trackArtistEl.textContent    = safeArtist;
-    artworkCaptionEl.textContent = `${safeArtist} • ${safeTitle}`;
+    artworkCaptionEl.textContent = `${safeArtist} – ${safeTitle}`;
 
     fetchAlbumArt(safeArtist, safeTitle);
-  } catch (e) {
-    console.error("Metadata error:", e);
-  }
+  } catch (e) {}
 }
 
 /* Start metadata polling */
