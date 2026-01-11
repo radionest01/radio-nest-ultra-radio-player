@@ -5,7 +5,6 @@
   <title>Radio Nest Player</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Montserrat -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -44,7 +43,6 @@
       max-width: 960px;
     }
 
-    /* HEADER – like site masthead, not a box */
     .site-header {
       display: flex;
       justify-content: space-between;
@@ -58,7 +56,9 @@
       color: var(--accent-blue);
       text-decoration: underline;
       cursor: pointer;
-      display: inline-block;
+      background: none;
+      border: none;
+      padding: 0;
     }
 
     .site-sub {
@@ -81,7 +81,6 @@
       font-weight: 600;
     }
 
-    /* MAIN PLAYER – no container box, just layout */
     .player-main {
       display: grid;
       grid-template-columns: 260px minmax(0, 1fr);
@@ -89,7 +88,6 @@
       align-items: center;
     }
 
-    /* LEFT: album art */
     .art-wrap {
       position: relative;
       width: 100%;
@@ -129,7 +127,6 @@
       color: var(--text-muted);
     }
 
-    /* RIGHT: text + controls */
     .right-wrap {
       display: flex;
       flex-direction: column;
@@ -194,11 +191,6 @@
       flex-shrink: 0;
     }
 
-    .play-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.85);
-    }
-
     .volume-wrap {
       flex: 1;
     }
@@ -224,20 +216,6 @@
       box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
     }
 
-    .volume-bar::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
-    }
-
-    .volume-bar::-moz-range-track {
-      height: 5px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.22);
-    }
-
     .footer-row {
       display: flex;
       justify-content: space-between;
@@ -251,36 +229,12 @@
     .meta-status.error {
       color: var(--error);
     }
-
-    /* RESPONSIVE */
-    @media (max-width: 800px) {
-      .player-main {
-        grid-template-columns: 1fr;
-        row-gap: 18px;
-      }
-
-      .art-wrap {
-        max-width: 260px;
-        margin-bottom: 6px;
-      }
-    }
-
-    @media (max-width: 520px) {
-      body {
-        padding: 18px;
-      }
-
-      .site-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-    }
   </style>
 </head>
+
 <body>
   <div class="page-wrap">
-    <!-- Header, like "THE MEDIA SITE UK" bar -->
+
     <header class="site-header">
       <div>
         <button
@@ -288,51 +242,35 @@
           type="button"
           onclick="window.open('https://myradionest.com', '_blank')"
         >
-          Radio Nest Player
+          RADIO NEST PLAYER
         </button>
         <div class="site-sub">RADIO NEST · STREAMING</div>
       </div>
+
       <div class="header-right">
         <span>On Air</span> Now Playing
       </div>
     </header>
 
-    <!-- Main player area -->
     <main class="player-main">
-      <!-- LEFT: Album art -->
       <div class="art-wrap">
-        <img
-          id="albumArt"
-          class="art-img"
-          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png"
-          alt="Album art"
-        />
+        <img id="albumArt" class="art-img" src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png">
         <div class="art-overlay"></div>
         <div id="fallbackChip" class="fallback-chip">RADIO - LIVE STREAM</div>
       </div>
 
-      <!-- RIGHT: Metadata + controls -->
       <div class="right-wrap">
         <div>
-          <div class="onair-label">
-            <span>On Air</span> Now Playing
-          </div>
+          <div class="onair-label"><span>On Air</span> Now Playing</div>
           <div id="trackTitle" class="track-title">Loading...</div>
           <div id="trackArtist" class="track-artist"></div>
           <div id="trackSub" class="track-sub">Radio - Live Stream</div>
         </div>
 
         <div class="controls-row">
-          <button id="playBtn" class="play-btn" type="button">Play</button>
+          <button id="playBtn" class="play-btn">Play</button>
           <div class="volume-wrap">
-            <input
-              id="volumeSlider"
-              type="range"
-              min="0"
-              max="100"
-              value="100"
-              class="volume-bar"
-            />
+            <input id="volumeSlider" type="range" min="0" max="100" value="100" class="volume-bar">
           </div>
         </div>
 
@@ -342,6 +280,7 @@
         </div>
       </div>
     </main>
+
   </div>
 
   <audio id="audioEl"></audio>
@@ -362,42 +301,26 @@
       const trackSubEl = document.getElementById("trackSub");
       const metaStatusEl = document.getElementById("metaStatus");
 
-      const FALLBACK_ART =
-        "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
+      const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
       const FALLBACK_TEXT = "Radio - Live Stream";
 
-      // Stream setup
-      if (streamUrl) {
-        audio.src = streamUrl;
-      }
+      if (streamUrl) audio.src = streamUrl;
       audio.volume = 1.0;
 
-      // Play / Pause button (text: Play / Pause)
       playBtn.addEventListener("click", () => {
         if (!audio.src) return;
         if (audio.paused) {
-          audio
-            .play()
-            .then(() => {
-              playBtn.textContent = "Pause";
-            })
-            .catch((err) => console.error("Playback error:", err));
+          audio.play().then(() => playBtn.textContent = "Pause");
         } else {
           audio.pause();
           playBtn.textContent = "Play";
         }
       });
 
-      audio.addEventListener("play", () => (playBtn.textContent = "Pause"));
-      audio.addEventListener("pause", () => (playBtn.textContent = "Play"));
-
-      // Volume
       volumeSlider.addEventListener("input", () => {
-        const v = Number(volumeSlider.value || 0);
-        audio.volume = Math.min(Math.max(v / 100, 0), 1);
+        audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
       });
 
-      // Metadata + artwork
       async function fetchMetadata() {
         if (!metaUrl) {
           metaStatusEl.textContent = "No metadata source configured";
@@ -410,11 +333,10 @@
 
         try {
           const res = await fetch(metaUrl, { cache: "no-store" });
-          if (!res.ok) throw new Error("HTTP " + res.status);
           const data = await res.json();
 
-          const artist = (data.artist || "").toString().trim();
-          const title = (data.title || "").toString().trim();
+          const artist = (data.artist || "").trim();
+          const title = (data.title || "").trim();
 
           if (!artist && !title) {
             trackTitleEl.textContent = "Loading...";
@@ -422,8 +344,6 @@
             trackSubEl.textContent = FALLBACK_TEXT;
             albumArt.src = FALLBACK_ART;
             fallbackChip.style.display = "inline-flex";
-            fallbackChip.textContent = "RADIO - LIVE STREAM";
-            metaStatusEl.textContent = "No track info in metadata";
             return;
           }
 
@@ -431,62 +351,42 @@
           trackArtistEl.textContent = artist || "";
           trackSubEl.textContent = FALLBACK_TEXT;
 
-          await updateArtworkFromItunes(artist, title);
+          await updateArtwork(artist, title);
           metaStatusEl.textContent = "Updated just now";
-        } catch (err) {
-          console.error("Metadata error:", err);
+
+        } catch {
           metaStatusEl.textContent = "Metadata error";
           metaStatusEl.classList.add("error");
-
-          if (!trackTitleEl.textContent || trackTitleEl.textContent === "Loading...") {
-            trackTitleEl.textContent = FALLBACK_TEXT;
-            trackSubEl.textContent = FALLBACK_TEXT;
-          }
           albumArt.src = FALLBACK_ART;
           fallbackChip.style.display = "inline-flex";
-          fallbackChip.textContent = "RADIO - LIVE STREAM";
         }
       }
 
-      async function updateArtworkFromItunes(artist, title) {
+      async function updateArtwork(artist, title) {
         const query = encodeURIComponent(`${artist} ${title}`.trim());
         if (!query) {
           albumArt.src = FALLBACK_ART;
           fallbackChip.style.display = "inline-flex";
-          fallbackChip.textContent = "RADIO - LIVE STREAM";
           return;
         }
 
-        const url = `https://itunes.apple.com/search?media=music&limit=1&term=${query}`;
         try {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error("HTTP " + res.status);
+          const res = await fetch(`https://itunes.apple.com/search?media=music&limit=1&term=${query}`);
           const json = await res.json();
 
-          if (!json.results || !json.results.length) {
+          if (!json.results.length) {
             albumArt.src = FALLBACK_ART;
             fallbackChip.style.display = "inline-flex";
-            fallbackChip.textContent = "RADIO - LIVE STREAM";
             return;
           }
 
-          const baseArt =
-            json.results[0].artworkUrl100 || json.results[0].artworkUrl60;
-          if (!baseArt) {
-            albumArt.src = FALLBACK_ART;
-            fallbackChip.style.display = "inline-flex";
-            fallbackChip.textContent = "RADIO - LIVE STREAM";
-            return;
-          }
-
-          const hiRes = baseArt.replace(/100x100bb\.jpg|60x60bb\.jpg/, "300x300bb.jpg");
-          albumArt.src = hiRes;
+          const art = json.results[0].artworkUrl100.replace("100x100bb.jpg", "300x300bb.jpg");
+          albumArt.src = art;
           fallbackChip.style.display = "none";
-        } catch (err) {
-          console.error("Artwork error:", err);
+
+        } catch {
           albumArt.src = FALLBACK_ART;
           fallbackChip.style.display = "inline-flex";
-          fallbackChip.textContent = "RADIO - LIVE STREAM";
         }
       }
 
@@ -499,5 +399,6 @@
       }
     })();
   </script>
+
 </body>
 </html>
