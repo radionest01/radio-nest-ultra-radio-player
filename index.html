@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Radio Nest Player</title>
@@ -7,275 +5,398 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --bg-main: #120f14;
-      --accent-orange: #ff9c35;
-      --accent-blue: #2f80ed;
-      --text-main: #ffffff;
-      --text-sub: #dcd6e5;
-      --text-muted: #a59fb2;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
+    /* Full-page transparent base */
     body {
-      min-height: 100vh;
+      margin: 0;
+      padding: 0;
       font-family: "Montserrat", system-ui, sans-serif;
-      color: var(--text-main);
-      background:
-        radial-gradient(circle at 10% 0%, rgba(255,190,130,0.35), transparent 60%),
-        radial-gradient(circle at 90% 100%, rgba(178,120,255,0.35), transparent 55%),
-        #08050b;
-      padding: 40px 50px;
+      background: transparent;
+      overflow-x: hidden;
     }
 
-    .page-wrap { max-width: 1400px; margin: 0 auto; }
+    /* Full-page glass blur layer */
+    .glass-bg {
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      z-index: 1;
+      pointer-events: none;
+      transition: background 0.3s ease;
+    }
 
-    .masthead { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
+    /* Light mode glass */
+    .theme-light .glass-bg {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Dark mode glass */
+    .theme-dark .glass-bg {
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    /* Player wrapper sits above the blur */
+    .page-wrap {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Masthead */
+    .masthead {
+      margin-bottom: 20px;
+    }
 
     .masthead-title {
-      font-size: 17px; font-weight: 700; color: var(--accent-blue);
-      text-decoration: underline; cursor: pointer; background: none; border: none;
-      padding: 0; text-align: left;
+      font-size: 17px;
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
     }
+
+    .theme-light .masthead-title { color: #2f80ed; }
+    .theme-dark .masthead-title { color: #8ab4ff; }
 
     .masthead-sub {
-      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--text-muted);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.7;
     }
 
+    /* Player layout */
     .player-layout {
-      display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: center;
     }
 
+    /* Album art */
     .art-wrap {
-      flex: 0 0 400px; aspect-ratio: 1/1; background: #000;
-      box-shadow: 0 22px 40px rgba(0,0,0,0.85); overflow: hidden; position: relative;
+      flex: 0 0 400px;
+      aspect-ratio: 1/1;
+      overflow: hidden;
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.5);
     }
 
-    .art-img { width: 100%; height: 100%; object-fit: cover; }
+    .art-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
     .fallback-chip {
-      position: absolute; left: 10px; bottom: 10px;
-      padding: 4px 10px; border-radius: 999px;
-      background: rgba(0,0,0,0.72); border: 1px solid rgba(255,255,255,0.3);
-      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--text-muted);
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.7;
     }
 
-    .meta-wrap { flex: 1; display: flex; flex-direction: column; }
+    .theme-light .fallback-chip {
+      background: rgba(255, 255, 255, 0.5);
+      color: #000;
+    }
+
+    .theme-dark .fallback-chip {
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+    }
+
+    /* Metadata */
+    .meta-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
     .onair-label {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.22em;
-      color: var(--text-muted); margin-bottom: 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      margin-bottom: 8px;
+      opacity: 0.7;
     }
 
-    .onair-label span { color: var(--accent-orange); font-weight: 600; }
+    .theme-light .onair-label span { color: #ff9c35; }
+    .theme-dark .onair-label span { color: #ffb866; }
 
     .track-title {
-      font-size: clamp(28px, 4vw, 36px); font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.04em;
-      margin-bottom: 4px; min-height: 1.2em;
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 4px;
     }
 
     .track-artist {
-      font-size: clamp(14px, 2vw, 16px); text-transform: uppercase;
-      letter-spacing: 0.22em; color: var(--text-sub);
-      margin-bottom: 10px; min-height: 1.1em;
+      font-size: clamp(14px, 2vw, 16px);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      opacity: 0.8;
+      margin-bottom: 10px;
     }
 
-    .track-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 18px; }
+    .track-sub {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-bottom: 18px;
+    }
 
-    .controls-block { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+    /* Controls */
+    .controls-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
     .play-btn {
-      width: 140px; height: 42px; border-radius: 8px;
-      background: #fff; color: #000; font-size: 14px; font-weight: 700;
-      border: none; cursor: pointer; box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+      width: 140px;
+      height: 42px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .theme-light .play-btn {
+      background: #fff;
+      color: #000;
+    }
+
+    .theme-dark .play-btn {
+      background: #fff;
+      color: #000;
     }
 
     .volume-wrap { width: 200px; }
 
     .volume-bar {
-      width: 100%; height: 4px; border-radius: 999px;
-      background: rgba(255,255,255,0.26); cursor: pointer;
-      -webkit-appearance: none; appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
+    .theme-light .volume-bar { background: rgba(0, 0, 0, 0.3); }
+    .theme-dark .volume-bar { background: rgba(255, 255, 255, 0.3); }
+
     .volume-bar::-webkit-slider-thumb {
-      width: 14px; height: 14px; border-radius: 50%;
-      background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.45);
-      -webkit-appearance: none; appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      -webkit-appearance: none;
+      appearance: none;
     }
   </style>
 </head>
 <body>
+
+  <!-- Full‑page glass blur layer -->
+  <div class="glass-bg"></div>
+
+  <!-- Player content wrapper -->
   <div class="page-wrap">
 
+    <!-- Masthead -->
     <div class="masthead">
-      <button class="masthead-title" onclick="window.open('https://myradionest.com', '_blank')">
-        RADIO NEST PLAYER
-      </button>
-      <div class="masthead-sub">RADIO NEST · STREAMING</div>
+      <button class="masthead-title" onclick="location.reload()">RADIO NEST PLAYER</button>
+      <div class="masthead-sub">UNIVERSAL EMBEDDED LISTENING EXPERIENCE</div>
     </div>
 
-    <main class="player-layout">
+    <!-- Player layout -->
+    <div class="player-layout">
+
+      <!-- Album Art -->
       <div class="art-wrap">
-        <img id="albumArt" class="art-img"
-          src="https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png">
-        <div id="fallbackChip" class="fallback-chip">RADIO - LIVE STREAM</div>
+        <img id="artwork" class="art-img" src="" alt="Album Art">
+        <div id="fallbackChip" class="fallback-chip" style="display:none;">NO ARTWORK</div>
       </div>
 
+      <!-- Metadata + Controls -->
       <div class="meta-wrap">
-        <div>
-          <div class="onair-label"><span>On Air</span> Now Playing</div>
-          <div id="trackTitle" class="track-title">Loading...</div>
-          <div id="trackArtist" class="track-artist"></div>
-          <div id="trackSub" class="track-sub">Radio - Live Stream</div>
-        </div>
+
+        <div class="onair-label"><span>●</span> NOW PLAYING</div>
+
+        <div id="trackTitle" class="track-title">Loading…</div>
+        <div id="trackArtist" class="track-artist"></div>
+        <div id="trackSub" class="track-sub"></div>
 
         <div class="controls-block">
-          <button id="playBtn" class="play-btn">Play</button>
+          <button id="playButton" class="play-btn">PLAY</button>
+
           <div class="volume-wrap">
-            <input id="volumeSlider" type="range" min="0" max="100" value="100" class="volume-bar">
+            <input id="volumeBar" class="volume-bar" type="range" min="0" max="100" value="80">
           </div>
         </div>
+
       </div>
-    </main>
-
-    <audio id="audioEl"></audio>
-<script>
-(function () {
-  const params = new URLSearchParams(window.location.search);
-  const streamUrl = params.get("stream") || "";
-  let metaUrl = params.get("meta") || "";
-
-  // Always wrap metadata URL in AllOrigins proxy
-  if (metaUrl) {
-    metaUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(metaUrl);
-  }
-
-  const audio = document.getElementById("audioEl");
-  const playBtn = document.getElementById("playBtn");
-  const volumeSlider = document.getElementById("volumeSlider");
-  const albumArt = document.getElementById("albumArt");
-  const fallbackChip = document.getElementById("fallbackChip");
-  const trackTitleEl = document.getElementById("trackTitle");
-  const trackArtistEl = document.getElementById("trackArtist");
-  const trackSubEl = document.getElementById("trackSub");
-
-  const FALLBACK_ART = "https://i.ibb.co/KpygTpfk/Online-Radio-Album-Art-Fall-Back-1.png";
-  const FALLBACK_TEXT = "Radio - Live Stream";
-
-  if (streamUrl) audio.src = streamUrl;
-  audio.volume = 1.0;
-
-  playBtn.addEventListener("click", () => {
-    if (!audio.src) return;
-
-    if (audio.paused) {
-      audio.play().then(() => playBtn.textContent = "Stop");
-    } else {
-      audio.pause();
-      playBtn.textContent = "Play";
-    }
-  });
-
-  volumeSlider.addEventListener("input", () => {
-    audio.volume = Math.min(Math.max(volumeSlider.value / 100, 0), 1);
-  });
-
-  async function fetchMetadata() {
-    if (!metaUrl) return;
-
-    try {
-      const res = await fetch(metaUrl, { cache: "no-store" });
-      const data = await res.json();
-
-      let artist = "";
-      let title = "";
-
-      // ICECAST
-      if (data.icestats) {
-        let source = data.icestats.source;
-        if (Array.isArray(source)) source = source[0];
-
-        if (source && source.title) {
-          const raw = source.title.trim();
-          if (raw.includes(" - ")) {
-            const parts = raw.split(" - ");
-            artist = parts[0].trim();
-            title = parts[1].trim();
-          } else {
-            title = raw;
-          }
-        }
-      }
-
-      // SHOUTCAST
-      if (data.artist) artist = data.artist.trim();
-      if (data.title) title = data.title.trim();
-
-      if (!artist && !title) {
-        trackTitleEl.textContent = "Loading...";
-        trackArtistEl.textContent = "";
-        albumArt.src = FALLBACK_ART;
-        fallbackChip.style.display = "inline-flex";
-        return;
-      }
-
-      trackTitleEl.textContent = title || FALLBACK_TEXT;
-      trackArtistEl.textContent = artist || "";
-      trackSubEl.textContent = FALLBACK_TEXT;
-
-      await updateArtwork(artist, title);
-
-    } catch {
-      albumArt.src = FALLBACK_ART;
-      fallbackChip.style.display = "inline-flex";
-    }
-  }
-
-  async function updateArtwork(artist, title) {
-    const q = `${artist} ${title}`.trim();
-    if (!q) {
-      albumArt.src = FALLBACK_ART;
-      fallbackChip.style.display = "inline-flex";
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `https://itunes.apple.com/search?media=music&limit=1&term=${encodeURIComponent(q)}`
-      );
-      const json = await res.json();
-
-      if (!json.results.length) {
-        albumArt.src = FALLBACK_ART;
-        fallbackChip.style.display = "inline-flex";
-        return;
-      }
-
-      // Upscale to 1200x1200
-      const art = json.results[0].artworkUrl100
-        .replace("100x100bb.jpg", "1200x1200bb.jpg")
-        .replace("100x100bb.png", "1200x1200bb.png");
-
-      albumArt.src = art;
-      fallbackChip.style.display = "none";
-
-    } catch {
-      albumArt.src = FALLBACK_ART;
-      fallbackChip.style.display = "inline-flex";
-    }
-  }
-
-  if (metaUrl) {
-    fetchMetadata();
-    setInterval(fetchMetadata, 15000);
-  }
-})();
-</script>
+    </div>
+  </div>
 
 </body>
-</html>
+<script>
+/* -----------------------------------------------------------
+   AUTO LIGHT / DARK THEME DETECTION
+----------------------------------------------------------- */
+function detectTheme() {
+  try {
+    const bg = window.getComputedStyle(window.parent.document.body).backgroundColor;
+
+    // Extract RGB
+    const match = bg.match(/rgba?\((\d+), (\d+), (\d+)(?:, [\d.]+)?\)/);
+    if (!match) return;
+
+    const r = parseInt(match[1]);
+    const g = parseInt(match[2]);
+    const b = parseInt(match[3]);
+
+    // Relative luminance
+    const luminance = 0.2126*r + 0.7152*g + 0.0722*b;
+
+    if (luminance > 140) {
+      document.body.classList.add("theme-light");
+      document.body.classList.remove("theme-dark");
+    } else {
+      document.body.classList.add("theme-dark");
+      document.body.classList.remove("theme-light");
+    }
+  } catch (e) {
+    // Default to dark if cross‑domain or unreadable
+    document.body.classList.add("theme-dark");
+  }
+}
+
+detectTheme();
+setInterval(detectTheme, 2000);
+
+
+/* -----------------------------------------------------------
+   STREAM + METADATA SETUP
+----------------------------------------------------------- */
+const urlParams = new URLSearchParams(window.location.search);
+const streamURL = urlParams.get("stream");
+const metaURL = urlParams.get("meta");
+
+const audio = new Audio();
+audio.src = streamURL;
+audio.preload = "none";
+audio.crossOrigin = "anonymous";
+
+const playButton = document.getElementById("playButton");
+const volumeBar = document.getElementById("volumeBar");
+
+const titleEl = document.getElementById("trackTitle");
+const artistEl = document.getElementById("trackArtist");
+const subEl = document.getElementById("trackSub");
+
+const artworkEl = document.getElementById("artwork");
+const fallbackChip = document.getElementById("fallbackChip");
+
+
+/* -----------------------------------------------------------
+   PLAY / PAUSE
+----------------------------------------------------------- */
+playButton.addEventListener("click", () => {
+  if (audio.paused) {
+    audio.play();
+    playButton.textContent = "PAUSE";
+  } else {
+    audio.pause();
+    playButton.textContent = "PLAY";
+  }
+});
+
+
+/* -----------------------------------------------------------
+   VOLUME
+----------------------------------------------------------- */
+volumeBar.addEventListener("input", () => {
+  audio.volume = volumeBar.value / 100;
+});
+
+
+/* -----------------------------------------------------------
+   METADATA FETCHING
+----------------------------------------------------------- */
+async function fetchMetadata() {
+  try {
+    const res = await fetch(metaURL + "?_=" + Date.now());
+    const data = await res.json();
+
+    const title = data.icestats?.source?.title || "Unknown Title";
+    const artist = data.icestats?.source?.artist || "";
+    const album = data.icestats?.source?.album || "";
+
+    titleEl.textContent = title;
+    artistEl.textContent = artist;
+    subEl.textContent = album;
+
+    updateArtwork(title, artist);
+  } catch (e) {
+    titleEl.textContent = "Unable to load metadata";
+  }
+}
+
+setInterval(fetchMetadata, 5000);
+fetchMetadata();
+
+
+/* -----------------------------------------------------------
+   ARTWORK FETCHING + UPSCALE
+----------------------------------------------------------- */
+async function updateArtwork(title, artist) {
+  const query = encodeURIComponent(`${title} ${artist}`);
+
+  try {
+    const res = await fetch(
+      `https://itunes.apple.com/search?term=${query}&entity=song&limit=1`
+    );
+    const data = await res.json();
+
+    if (data.results && data.results.length > 0) {
+      let art = data.results[0].artworkUrl100;
+
+      // Upscale to 1200x1200
+      art = art.replace("100x100bb.jpg", "1200x1200bb.jpg");
+
+      artworkEl.src = art;
+      fallbackChip.style.display = "none";
+    } else {
+      showFallback();
+    }
+  } catch (e) {
+    showFallback();
+  }
+}
+
+function showFallback() {
+  artworkEl.src = "";
+  fallbackChip.style.display = "block";
+}
+
+
+/* -----------------------------------------------------------
+   INITIAL VOLUME
+----------------------------------------------------------- */
+audio.volume = 1.0;
+</script>
